@@ -1,6 +1,7 @@
 import Link from "next/link";
 import bills from "./bills";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const page = () => {
   const activeBills = bills.filter(
@@ -15,8 +16,11 @@ const page = () => {
       {/* Active Bills */}
       {activeBills.length > 0 && (
         <>
-          <h1 className="text-2xl lg:text-4xl lg:font-extrabold font-bold tracking-wide mt-5 ml-5">
+          <h1 className="flex justify-between items-center text-2xl lg:text-4xl lg:font-extrabold font-bold tracking-wide mt-5 ml-5">
             ACTIVE BILLS
+            <Button className="hover:cursor-pointer mr-8 bg-[var(--ring)] text-white text-xl">
+              Create New Bill
+            </Button>
           </h1>
           <div className="w-full flex flex-row flex-wrap">
             {activeBills.map((bill) => (

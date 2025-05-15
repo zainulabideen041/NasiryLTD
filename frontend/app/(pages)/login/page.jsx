@@ -1,11 +1,20 @@
+"use client";
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const Login = () => {
+  const router = useRouter();
+
+  const NavigateDashboard = () => {
+    router.push("/dashboard");
+  };
+
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="text-3xl lg:text-5xl text-center font-extrabold p-5">
@@ -37,7 +46,10 @@ const Login = () => {
           Forgot Password?
         </Link>
       </div>
-      <Button className="dark:text-white w-[30%] mt-8 hover:cursor-pointer text-lg bg-[var(--ring)] hover:bg-green-800 font-bold">
+      <Button
+        onClick={NavigateDashboard}
+        className="dark:text-white w-[30%] mt-8 hover:cursor-pointer text-lg bg-[var(--ring)] hover:bg-green-800 font-bold"
+      >
         <LogIn size={20} /> Login
       </Button>
     </div>

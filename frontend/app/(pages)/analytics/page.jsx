@@ -4,7 +4,7 @@ const page = () => {
   return (
     <div className="flex flex-col w-full">
       <h1 className="text-2xl lg:text-4xl lg:font-extrabold font-bold tracking-wide mt-5 ml-5">
-        ANALYTICS
+        ANALYTICS PAGE UNDER DEVELOPED
       </h1>
     </div>
   );
