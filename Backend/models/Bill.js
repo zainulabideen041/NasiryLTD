@@ -19,10 +19,14 @@ const billSchema = new mongoose.Schema({
   finalDate: {
     type: Date,
   },
+  status: {
+    type: String,
+    default: "Active",
+    enum: ["Active", "Closed"],
+  },
   invoices: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Invoice",
+      type: String,
     },
   ],
 });

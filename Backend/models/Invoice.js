@@ -14,9 +14,8 @@ const invoiceSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  bill: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Bill",
+  billNo: {
+    type: String,
     required: true,
   },
 });

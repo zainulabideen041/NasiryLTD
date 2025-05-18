@@ -3,33 +3,33 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 
 // REGISTER Admin CONTROLLER
-const register = async (req, res) => {
-  const { name, email, password } = req.body;
-  try {
-    const checkUser = await User.findOne({ email });
-    if (checkUser)
-      return res.json({
-        success: false,
-        message: "User already registered with this email address",
-      });
+// const register = async (req, res) => {
+//   const { name, email, password } = req.body;
+//   try {
+//     const checkUser = await Admin.findOne({ email });
+//     if (checkUser)
+//       return res.json({
+//         success: false,
+//         message: "User already registered with this email address",
+//       });
 
-    const hashPass = await bcrypt.hash(password, 12);
+//     const hashPass = await bcrypt.hash(password, 12);
 
-    const newUser = new Admin({ name, email, password: hashPass });
-    await newUser.save();
+//     const newUser = new Admin({ name, email, password: hashPass });
+//     await newUser.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Registration successful",
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred",
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       message: "Registration successful",
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "An error occurred",
+//     });
+//   }
+// };
 
 // LOGIN USER CONTROLLER
 const login = async (req, res) => {
@@ -111,4 +111,9 @@ const logout = async (req, res) => {
     .json({ success: true, message: "Logged out Successfully" });
 };
 
-module.exports = { register, login, logout, authMiddleware };
+module.exports = {
+  // register,
+  login,
+  logout,
+  authMiddleware,
+};

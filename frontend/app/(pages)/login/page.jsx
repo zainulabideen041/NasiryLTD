@@ -20,7 +20,7 @@ const Login = () => {
       <div className="text-3xl lg:text-5xl text-center font-extrabold p-5">
         Login to your Account
       </div>
-      <div className="relative w-full max-w-xl items-center gap-1.5 border rounded-xl mt-8 p-15">
+      <div className="relative w-full max-w-xl items-center gap-1.5 border rounded-xl mt-4 md:mt-7 mr-1 ml-1 p-15">
         <Label htmlFor="email" className="text-lg font-bold">
           Email
         </Label>
@@ -28,7 +28,7 @@ const Login = () => {
           type="email"
           id="email"
           placeholder="Enter your Email Address here"
-          className="text-xl"
+          className="text-lg md:text-xl"
         />
         <Label htmlFor="password" className="text-lg font-bold mt-8">
           Password
@@ -37,7 +37,7 @@ const Login = () => {
           type="password"
           id="password"
           placeholder="Enter your Password here"
-          className="text-xl"
+          className="text-lg md:text-xl"
         />
         <Link
           href=""
