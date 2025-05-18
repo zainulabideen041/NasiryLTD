@@ -57,7 +57,7 @@ const Sidebar = () => {
                     onClick();
                   }
                 }}
-                className={`flex gap-3 text-xl font-bold p-3 lg:p-6 mt-5 lg:mt-3 mb-3 items-center text-black dark:text-white text-center hover:bg-green-700 transition-colors ${
+                className={`flex gap-2 text-xl font-bold p-2 md:p-3 lg:p-6 mt-5 lg:mt-3 mb-3 items-center text-black dark:text-white text-center hover:bg-green-700 transition-colors ${
                   pathname === href ? "bg-green-700 text-white" : ""
                 }`}
               >
