@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 // const baseURL = "https://ecomtryonbackend.vercel.app/api/auth";
-const baseURL = "http://localhost:7000/auth";
+const baseURL = "https://nasiry-backend.vercel.app/auth";
 
 const initialState = {
   isAuthenticated: false,
