@@ -158,7 +158,10 @@ const BillDetails = ({ params }) => {
       <header className="flex justify-center p-5">
         <Popover open={showAddPopover} onOpenChange={setShowAddPopover}>
           <PopoverTrigger asChild>
-            <Button className="hover:cursor-pointer bg-[var(--ring)] text-white text-xl">
+            <Button
+              onClick={resetForm}
+              className="hover:cursor-pointer bg-[var(--ring)] text-white text-xl"
+            >
               Add New Invoice
             </Button>
           </PopoverTrigger>
@@ -384,6 +387,12 @@ const BillDetails = ({ params }) => {
           </PopoverContent>
         </Popover>
       )}
+      <Button
+        variant="destructive"
+        className="hover:cursor-pointer bg-[var(--ring)] pl-5 pr-5 w-full sm:w-[70%] ml-1 lg:w-[50%] mr-2 mt-5 text-white text-xl"
+      >
+        Close the Bill
+      </Button>
     </div>
   );
 };
