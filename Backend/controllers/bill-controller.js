@@ -1,4 +1,5 @@
 const Bill = require("../models/Bill");
+const Invoice = require("../models/Invoice");
 
 const CreateBill = async (req, res) => {
   try {
@@ -49,13 +50,22 @@ const DisplayBill = async (req, res) => {
       return res.json("No Bill Found!");
     }
 
+    // Fetch full invoice details using invoiceNo from the bill
+    const fullInvoices = await Invoice.find({
+      invoiceNo: { $in: bill.invoices },
+    });
+
+    // Return bill details along with invoice details
     res.json({
       success: true,
-      bill,
+      bill: {
+        ...bill.toObject(),
+        invoices: fullInvoices,
+      },
     });
   } catch (error) {
     console.error("Error Displaying bill:", error);
-    res.status(500).error({
+    res.status(500).json({
       success: false,
       message: "Failed to Display bill.",
       error: error,
@@ -67,20 +77,43 @@ const DisplayBills = async (req, res) => {
   try {
     const bills = await Bill.find();
 
-    if (!bills) {
+    if (!bills || bills.length === 0) {
       return res.json("No Bills Found!");
     }
 
+    // Collect all invoice numbers from all bills
+    const allInvoiceNos = bills.flatMap((bill) => bill.invoices);
+
+    // Fetch all invoice details
+    const invoices = await Invoice.find({ invoiceNo: { $in: allInvoiceNos } });
+
+    // Map invoiceNo to invoice object for quick lookup
+    const invoiceMap = {};
+    invoices.forEach((inv) => {
+      invoiceMap[inv.invoiceNo] = inv;
+    });
+
+    // Attach full invoice details to each bill
+    const enrichedBills = bills.map((bill) => {
+      const fullInvoices = bill.invoices
+        .map((invNo) => invoiceMap[invNo])
+        .filter(Boolean);
+      return {
+        ...bill.toObject(),
+        invoices: fullInvoices,
+      };
+    });
+
     res.json({
       success: true,
-      bills,
+      bills: enrichedBills,
     });
   } catch (error) {
-    console.error("Error creating bill:", error);
-    res.status(500).error({
+    console.error("Error displaying bills:", error);
+    res.status(500).json({
       success: false,
-      message: "Failed to create bill.",
-      error: error,
+      message: "Failed to display bills.",
+      error,
     });
   }
 };

@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { use } from "react";
-import bills from "../bills";
-import invoices from "../invoices";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-
+import { useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
+import { getBillByNo } from "@/redux/bill-slice";
+import {
+  addInvoice,
+  deleteInvoice,
+  updateInvoice,
+} from "@/redux/invoice-slice";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Table,
@@ -30,35 +34,53 @@ import {
 } from "@/components/ui/popover";
 
 const BillDetails = ({ params }) => {
-  const { billNo } = use(params); // ✅ Unwrap the promise
+  const { billNo } = use(params);
 
-  const bill = bills.find((b) => b.billNo === billNo);
+  const dispatch = useDispatch();
+  const [bill, setBill] = useState({});
+  const [invoices, setInvoices] = useState([]);
+
+  useEffect(() => {
+    const getBillDetails = async () => {
+      const resultAction = await dispatch(getBillByNo(billNo));
+      if (getBillByNo.fulfilled.match(resultAction)) {
+        const billData = resultAction.payload;
+        setBill(billData);
+        setInvoices(billData.invoices || []);
+      } else {
+        console.error("Failed to fetch bill:", resultAction.error);
+      }
+    };
+
+    getBillDetails();
+  }, [billNo, dispatch]);
+
   if (!bill) return notFound();
 
-  const relatedInvoices = invoices.filter(
-    (invoice) => invoice.billNo === billNo
-  );
-  const totalAmount = relatedInvoices.reduce(
-    (acc, curr) => acc + curr.amount,
+  const totalAmount = invoices.reduce(
+    (sum, invoice) => sum + (invoice.amount || 0),
     0
   );
 
-  const [editInvoice, setEditInvoice] = useState(null); // for edit mode
-  const [showAddPopover, setShowAddPopover] = useState(false); // for add mode
+  const [editInvoice, setEditInvoice] = useState(null);
+  const [showAddPopover, setShowAddPopover] = useState(false);
 
   const [formData, setFormData] = useState({
+    billNo: billNo,
     invoiceNo: "",
     date: "",
     amount: "",
   });
 
-  const resetForm = () => setFormData({ invoiceNo: "", date: "", amount: "" });
+  const resetForm = () =>
+    setFormData({ billNo: billNo, invoiceNo: "", date: "", amount: "" });
 
   const handleRowClick = (invoice) => {
     setEditInvoice(invoice.invoiceNo);
     setFormData({
+      billNo: billNo,
       invoiceNo: invoice.invoiceNo,
-      date: invoice.date,
+      date: invoice.date ? invoice.date.split("T")[0] : "",
       amount: invoice.amount,
     });
   };
@@ -70,19 +92,59 @@ const BillDetails = ({ params }) => {
     }));
   };
 
-  const handleAdd = () => {
-    console.log("New Invoice:", formData);
+  const handleAdd = async () => {
+    if (!formData.invoiceNo || !formData.date || !formData.amount) {
+      alert("All fields are required.");
+      return;
+    }
+
+    try {
+      const resultAction = await dispatch(addInvoice(formData));
+      if (addInvoice.fulfilled.match(resultAction)) {
+        // Update local state with the new invoice
+        setInvoices([...invoices, resultAction.payload]);
+      }
+    } catch (error) {
+      console.error("Failed to add invoice:", error);
+    }
+
     resetForm();
     setShowAddPopover(false);
   };
 
-  const handleUpdate = () => {
-    console.log("Updated Invoice:", formData);
+  const handleUpdate = async () => {
+    try {
+      const resultAction = await dispatch(updateInvoice(formData));
+      if (updateInvoice.fulfilled.match(resultAction)) {
+        // Update the invoice in the local state
+        setInvoices(
+          invoices.map((invoice) =>
+            invoice.invoiceNo === formData.invoiceNo
+              ? { ...invoice, ...formData }
+              : invoice
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update invoice:", error);
+    }
+
     setEditInvoice(null);
   };
 
-  const handleDelete = () => {
-    console.log("Deleted Invoice:", formData);
+  const handleDelete = async () => {
+    try {
+      const resultAction = await dispatch(deleteInvoice(formData.invoiceNo));
+      if (deleteInvoice.fulfilled.match(resultAction)) {
+        // Remove the invoice from local state
+        setInvoices(
+          invoices.filter((invoice) => invoice.invoiceNo !== formData.invoiceNo)
+        );
+      }
+    } catch (error) {
+      console.error("Failed to delete invoice:", error);
+    }
+
     setEditInvoice(null);
   };
 
@@ -125,7 +187,10 @@ const BillDetails = ({ params }) => {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent
+                        className="w-auto p-0 text-left"
+                        align="start"
+                      >
                         <Calendar
                           mode="single"
                           onSelect={(selectedDate) => {
@@ -189,23 +254,27 @@ const BillDetails = ({ params }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {relatedInvoices.map((invoice) => (
-            <TableRow
-              key={invoice.invoiceNo}
-              onClick={() => handleRowClick(invoice)}
-              className="flex justify-between"
-            >
-              <TableCell className="font-extralight">
-                {invoice.invoiceNo}
-              </TableCell>
-              <TableCell className="md:text-center font-extralight">
-                {invoice.date}
-              </TableCell>
-              <TableCell className="md:text-right font-extralight">
-                ${invoice.amount}
-              </TableCell>
-            </TableRow>
-          ))}
+          {invoices.length > 0 ? (
+            invoices.map((invoice) => (
+              <TableRow
+                key={invoice.invoiceNo}
+                onClick={() => handleRowClick(invoice)}
+                className="flex justify-between"
+              >
+                <TableCell className="font-extralight">
+                  {invoice.invoiceNo}
+                </TableCell>
+                <TableCell className="md:text-center font-extralight">
+                  {invoice.date.split("T")[0]}
+                </TableCell>
+                <TableCell className="md:text-right font-extralight">
+                  ${invoice.amount}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <></>
+          )}
         </TableBody>
         <TableFooter>
           <TableRow className="flex justify-between">
@@ -238,7 +307,7 @@ const BillDetails = ({ params }) => {
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-[240px] justify-start text-left font-normal",
+                            "w-[240px] md:w-[150px] justify-start text-left font-normal",
                             !formData.date && "text-muted-foreground"
                           )}
                         >
@@ -272,14 +341,15 @@ const BillDetails = ({ params }) => {
 
                   {/* Invoice */}
                   <div className="flex items-center gap-2 p-5">
-                    <Label htmlFor="date">Invoice</Label>
+                    <Label htmlFor="invoice">Invoice</Label>
                     <Input
-                      id="date"
+                      readOnly
+                      id="invoiceno"
                       value={formData.invoiceNo}
                       onChange={(e) =>
                         handleChange("invoiceNo", e.target.value)
                       }
-                      className="col-span-2 h-8"
+                      className="col-span-2 h-8 w-full"
                     />
                   </div>
 
@@ -291,7 +361,7 @@ const BillDetails = ({ params }) => {
                       type="number"
                       value={formData.amount}
                       onChange={(e) => handleChange("amount", +e.target.value)}
-                      className="col-span-2 h-8"
+                      className="col-span-2 h-8 "
                     />
                   </div>
                 </div>

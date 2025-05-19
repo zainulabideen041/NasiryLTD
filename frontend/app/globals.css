@@ -3,11 +3,37 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"); */
+
+@font-face {
+  font-family: "poppins";
+  src: url("/fonts/poppins.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "poppins", sans-serif;
+  font-weight: 400;
   overflow-x: hidden;
+}
+
+/* 👇 Add this to your global styles like app/globals.css */
+.rdp {
+  --rdp-cell-size: 40px; /* Adjusts grid layout */
+}
+
+.rdp-head {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.rdp-head th {
+  text-align: center;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
 }
 
 @theme inline {

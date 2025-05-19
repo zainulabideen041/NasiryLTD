@@ -16,9 +16,9 @@ const Navbar = () => {
         <Image
           src="/hen.png"
           alt=""
-          width={80}
+          width={100}
           height={100}
-          className="dark:invert ml-1"
+          className="dark:invert ml-1 w-19 lg:w-25"
         />
         <div className="flex flex-col items-center pt-2 pb-2 pl-1 pr-1">
           <div className="relative">
@@ -29,39 +29,39 @@ const Navbar = () => {
               height={100}
               className="dark:invert w-35 lg:w-60"
             />
-            <span className="absolute top-1 left-35 lg:left-60 text-[10px] text-white bg-black px-1 rounded-sm dark:bg-white dark:text-black">
+            <span className="absolute top-1 left-34 lg:left-60 text-[10px] text-white bg-black px-1 rounded-sm dark:bg-white dark:text-black">
               LTD
             </span>
           </div>
-          <p className="text-sm sm:text-xl font-light p-2 lg:text-2xl">
+          <p className="text-sm sm:text-xl font-light p-1 md:p-2 lg:text-2xl">
             Wholesale & Retail of Fresh Quality Halal Meat & Poultry
           </p>
         </div>
         <Image
           src="/sheep.png"
           alt=""
-          width={100}
+          width={120}
           height={100}
-          className="dark:invert mr-1"
+          className="dark:invert mr-1 w-23 lg:w-30"
         />
         <div className="hidden lg:block absolute right-15">
           <ModeToggle />
         </div>
       </main>
       <div className="border flex flex-row flex-wrap justify-around p-2">
-        <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-md sm:font-light lg:text-lg items-center">
+        <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-md sm:font-light lg:text-lg items-center pl-2 pr-2">
           <span className="mr-1">
             <Phone size={20} className="w-4 md:w-5" />
           </span>
           +44 755 455 655
         </p>
-        <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-sm sm:font-light lg:text-lg items-center">
+        <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-sm sm:font-light lg:text-lg items-center pl-2 pr-2">
           <span className="mr-1">
             <Phone size={20} className="w-4 md:w-5" />
           </span>
           +44 755 455 655
         </p>
-        <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-sm sm:font-light lg:text-lg items-center">
+        <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-sm sm:font-light lg:text-lg items-center pl-2 pr-2">
           <span className="mr-1">
             <MapPin size={20} className="w-4 md:w-5" />
           </span>

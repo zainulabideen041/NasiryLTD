@@ -1,57 +1,133 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { loginUser } from "@/redux/auth-slice";
+import { useDispatch } from "react-redux";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
+import Swal from "sweetalert2";
 
 const Login = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
   const router = useRouter();
 
-  const NavigateDashboard = () => {
-    router.push("/dashboard");
+  const onChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    if (!formData.email || !formData.password) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please enter both email and password.",
+      });
+      return;
+    }
+
+    const res = await dispatch(loginUser(formData));
+
+    if (res?.payload?.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: res.payload.message,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setLoading(false);
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: res.payload?.message || "Invalid credentials.",
+      });
+    }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <div className="text-3xl lg:text-5xl text-center font-extrabold p-5">
+    <div className="flex flex-col justify-center items-center px-4">
+      <h1 className="text-3xl lg:text-5xl text-center font-extrabold p-5">
         Login to your Account
-      </div>
-      <div className="relative w-full max-w-xl items-center gap-1.5 border rounded-xl mt-4 md:mt-7 mr-1 ml-1 p-15">
-        <Label htmlFor="email" className="text-lg font-bold">
-          Email
-        </Label>
-        <Input
-          type="email"
-          id="email"
-          placeholder="Enter your Email Address here"
-          className="text-lg md:text-xl"
-        />
-        <Label htmlFor="password" className="text-lg font-bold mt-8">
-          Password
-        </Label>
-        <Input
-          type="password"
-          id="password"
-          placeholder="Enter your Password here"
-          className="text-lg md:text-xl"
-        />
-        <Link
-          href=""
-          className="absolute right-15 bottom-2 dark:text-red-400 dark:hover:text-red-300 text-red-400 hover:text-red-500"
-        >
-          Forgot Password?
-        </Link>
-      </div>
-      <Button
-        onClick={NavigateDashboard}
-        className="dark:text-white w-[30%] mt-8 hover:cursor-pointer text-lg bg-[var(--ring)] hover:bg-green-800 font-bold"
+      </h1>
+
+      <form
+        onSubmit={onSubmit}
+        className="w-full max-w-xl border rounded-xl p-6 flex flex-col gap-4"
       >
-        <LogIn size={20} /> Login
-      </Button>
+        <div>
+          <Label htmlFor="email" className="text-lg font-bold">
+            Email
+          </Label>
+          <Input
+            type="email"
+            id="email"
+            placeholder="Enter your Email Address"
+            value={formData.email}
+            onChange={onChange}
+            className="text-lg md:text-xl"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="password" className="text-lg font-bold">
+            Password
+          </Label>
+          <Input
+            type="password"
+            id="password"
+            placeholder="Enter your Password"
+            value={formData.password}
+            onChange={onChange}
+            className="text-lg md:text-xl"
+          />
+        </div>
+
+        <div className="text-right">
+          <Link href="#" className="text-sm text-red-500 hover:text-red-400">
+            Forgot Password?
+          </Link>
+        </div>
+        {loading ? (
+          <Button
+            disabled
+            className="w-full mt-4 text-lg font-bold bg-[var(--ring)] hover:bg-green-800 text-white"
+          >
+            <Loader2 className="animate-spin" />
+            Please wait
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            className="w-full mt-4 text-lg font-bold bg-[var(--ring)] hover:bg-green-800 hover:cursor-pointer text-white"
+          >
+            <LogIn size={20} className="mr-2" />
+            Login
+          </Button>
+        )}
+      </form>
     </div>
   );
 };

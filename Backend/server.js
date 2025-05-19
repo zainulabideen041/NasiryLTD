@@ -20,7 +20,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: ["https://nasiry-ltd.vercel.app", "http://localhost:3000/"],
+    origin: ["https://nasiry-ltd.vercel.app", "http://localhost:3000"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -41,7 +41,7 @@ app.use("/bill", billRouter);
 app.use("/invoice", invoiceRouter);
 
 app.get("/", (req, res) => {
-  res.json("Hello Nasiry Server");
+  res.json("Hello Server");
 });
 
 app.listen(PORT, () =>

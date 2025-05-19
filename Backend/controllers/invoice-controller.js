@@ -48,6 +48,47 @@ const AddInvoice = async (req, res) => {
   }
 };
 
+const UpdateInvoice = async (req, res) => {
+  try {
+    const { invoiceNo, date, amount } = req.body;
+
+    if (!invoiceNo) {
+      return res.status(400).json({
+        success: false,
+        message: "invoiceNo is required to update the invoice.",
+      });
+    }
+
+    const invoice = await Invoice.findOne({ invoiceNo });
+
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: "Invoice not found.",
+      });
+    }
+
+    // Update only the provided fields
+    if (date !== undefined) invoice.date = date;
+    if (amount !== undefined) invoice.amount = amount;
+
+    await invoice.save();
+
+    res.json({
+      success: true,
+      message: "Invoice updated successfully.",
+      invoice,
+    });
+  } catch (error) {
+    console.error("Error updating invoice:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update invoice.",
+      error: error.message,
+    });
+  }
+};
+
 const DeleteInvoice = async (req, res) => {
   try {
     const { invoiceNo } = req.params;
@@ -83,4 +124,4 @@ const DeleteInvoice = async (req, res) => {
   }
 };
 
-module.exports = { AddInvoice, DeleteInvoice };
+module.exports = { AddInvoice, UpdateInvoice, DeleteInvoice };

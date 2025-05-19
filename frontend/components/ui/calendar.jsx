@@ -1,20 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}) {
+function Calendar({ className, classNames, showOutsideDays = true, ...props }) {
   return (
-    (<DayPicker
+    <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
@@ -29,8 +24,8 @@ function Calendar({
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-x-1",
-        head_row: "flex",
+        table: "w-full border-collapse",
+        head_row: "grid grid-cols-7 gap-1",
         head_cell:
           "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
@@ -67,8 +62,9 @@ function Calendar({
           <ChevronRight className={cn("size-4", className)} {...props} />
         ),
       }}
-      {...props} />)
+      {...props}
+    />
   );
 }
 
-export { Calendar }
+export { Calendar };

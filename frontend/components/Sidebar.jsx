@@ -1,5 +1,6 @@
 "use client";
 
+import { useDispatch } from "react-redux";
 import {
   LayoutDashboard,
   Receipt,
@@ -9,14 +10,31 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "./DarkMode";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { logoutUser } from "@/redux/auth-slice";
+import Swal from "sweetalert2";
 
 const Sidebar = () => {
-  const router = useRouter();
   const pathname = usePathname();
 
-  const navigateLogin = () => {
-    router.push("/login");
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(logoutUser());
+        router.push("/");
+        Swal.fire("Logged out!", "You have been logged out.", "success");
+      }
+    });
   };
 
   const links = [
@@ -36,7 +54,7 @@ const Sidebar = () => {
       href: "/",
       icon: <LogOut size={30} />,
       label: "Logout",
-      onClick: () => router.push("/"),
+      onClick: handleLogout,
     },
   ];
 

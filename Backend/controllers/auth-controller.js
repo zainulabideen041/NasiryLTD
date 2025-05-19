@@ -2,35 +2,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 
-// REGISTER Admin CONTROLLER
-// const register = async (req, res) => {
-//   const { name, email, password } = req.body;
-//   try {
-//     const checkUser = await Admin.findOne({ email });
-//     if (checkUser)
-//       return res.json({
-//         success: false,
-//         message: "User already registered with this email address",
-//       });
-
-//     const hashPass = await bcrypt.hash(password, 12);
-
-//     const newUser = new Admin({ name, email, password: hashPass });
-//     await newUser.save();
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Registration successful",
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       success: false,
-//       message: "An error occurred",
-//     });
-//   }
-// };
-
 // LOGIN USER CONTROLLER
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -54,29 +25,27 @@ const login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user._id,
-        username: user.userName,
         email: user.email,
-        role: user.role,
       },
-      process.env.JWT_SECRET
-      // { expiresIn: "60m" }
+      process.env.JWT_SECRET,
+      { expiresIn: "60m" }
     );
 
+    // Set cookie with correct configuration for cross-origin requests
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        // maxAge: 60 * 60 * 1000, // 60 minutes
-        sameSite: "None",
+        secure: true, // Always use secure in production and development with HTTPS
+        maxAge: 60 * 60 * 1000,
+        sameSite: "none", // Lowercase 'none' to ensure consistent behavior
+        path: "/", // Add explicit path
       })
       .json({
         success: true,
         message: "Login successful",
         user: {
           id: user._id,
-          username: user.userName,
           email: user.email,
-          role: user.role,
         },
       });
   } catch (error) {
@@ -91,6 +60,7 @@ const login = async (req, res) => {
 // AUTH CHECK MIDDLEWARE
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
+
   if (!token)
     return res.status(401).json({ success: false, message: "Unauthorized" });
 
@@ -107,12 +77,16 @@ const authMiddleware = async (req, res, next) => {
 //LOGOUT USER CONTROLLER
 const logout = async (req, res) => {
   res
-    .clearCookie("token")
+    .clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+    })
     .json({ success: true, message: "Logged out Successfully" });
 };
 
 module.exports = {
-  // register,
   login,
   logout,
   authMiddleware,

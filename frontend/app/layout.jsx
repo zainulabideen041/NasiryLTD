@@ -1,5 +1,8 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import LayoutStructure from "@/components/layoutStructure";
+import ProtectedRoute from "@/components/protectedRoute";
+import { Providers } from "@/redux/provider";
+
 import "./globals.css";
 
 export const metadata = {
@@ -13,14 +16,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <LayoutStructure children={children} />
-        </ThemeProvider>
+        <Providers>
+          <ProtectedRoute>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <LayoutStructure>{children}</LayoutStructure>
+            </ThemeProvider>
+          </ProtectedRoute>
+        </Providers>
       </body>
     </html>
   );
