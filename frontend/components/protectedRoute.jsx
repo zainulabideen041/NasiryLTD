@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Loading from "@/components/Loading";
+import { checkAuth } from "@/redux/auth-slice";
 
 const ProtectedRoute = ({ children }) => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
+
   const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
   const [isClient, setIsClient] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
@@ -15,21 +18,30 @@ const ProtectedRoute = ({ children }) => {
   const publicRoutes = ["/", "/reset-password"];
   const isPublicRoute = publicRoutes.includes(pathname);
 
+  // ✅ Dispatch auth check on mount
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // ✅ Handle redirects based on auth status
   useEffect(() => {
     if (!isLoading && isClient) {
       if (!isAuthenticated && !isPublicRoute) {
         router.push("/");
+      } else if (isAuthenticated && isPublicRoute) {
+        router.push("/dashboard");
       } else {
         setShouldRender(true);
       }
     }
   }, [isAuthenticated, isLoading, isClient, isPublicRoute, router]);
 
-  if (!isClient || isLoading || (!isAuthenticated && !isPublicRoute)) {
+  // ✅ Show loading overlay while checking auth
+  if (!isClient || isLoading) {
     return (
       <>
         {children}

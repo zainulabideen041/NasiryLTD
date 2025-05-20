@@ -16,6 +16,7 @@ export const createBill = createAsyncThunk(
   async (billData, { rejectWithValue }) => {
     try {
       const res = await axios.post(`${baseURL}/create`, billData);
+      console.log(res);
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -29,7 +30,6 @@ export const getBillByNo = createAsyncThunk(
   async (billNo, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${baseURL}/display/${billNo}`);
-      console.log(res.data.bill);
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

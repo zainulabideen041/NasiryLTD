@@ -3,8 +3,7 @@ const Invoice = require("../models/Invoice");
 
 const CreateBill = async (req, res) => {
   try {
-    const { customerName, customerAddress, customerPhone, createdDate } =
-      req.body;
+    const { customerName, customerAddress, customerPhone } = req.body;
 
     if (!customerName || !customerAddress) {
       return res.status(400).json({
@@ -22,7 +21,6 @@ const CreateBill = async (req, res) => {
       customerName,
       customerAddress,
       customerPhone,
-      createdDate,
     });
 
     await bill.save();

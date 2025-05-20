@@ -26,7 +26,6 @@ const Page = () => {
     customerName: "",
     customerAddress: "",
     customerPhone: "",
-    createdDate: "",
   });
 
   useEffect(() => {
@@ -54,7 +53,6 @@ const Page = () => {
       customerName: "",
       customerAddress: "",
       customerPhone: "",
-      createdDate: "",
     });
 
   const handleChange = (field, value) => {
@@ -74,7 +72,7 @@ const Page = () => {
       resetForm();
       setShowAddPopover(false);
     } catch (error) {
-      console.error("Failed to add invoice:", error);
+      console.error("An Error Occurred:", error);
     }
   };
 
@@ -94,46 +92,6 @@ const Page = () => {
             <h4 className="font-bold text-lg">Create New Bill</h4>
             <div className="grid gap-2">
               <div className="flex flex-col lg:flex-row flex-wrap justify-around">
-                {/* Date Picker */}
-                <div className="flex items-center gap-1 p-3">
-                  <Label htmlFor="date">Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] md:w-[150px] justify-start text-left font-normal",
-                          !formData.date && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.date ? (
-                          formData.date
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto p-0 text-left"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        onSelect={(selectedDate) => {
-                          if (selectedDate) {
-                            handleChange(
-                              "date",
-                              format(selectedDate, "yyyy-MM-dd")
-                            );
-                          }
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
                 <div className="flex items-center gap-2 p-5">
                   <Label htmlFor="customerName">Customer</Label>
                   <Input
@@ -150,9 +108,8 @@ const Page = () => {
                   <Label htmlFor="customerAddress">Address</Label>
                   <Input
                     id="customerAddress"
-                    type="text"
                     onChange={(e) =>
-                      handleChange("customerAddress", +e.target.value)
+                      handleChange("customerAddress", e.target.value)
                     }
                     className="col-span-2 h-8"
                     placeholder="Customer Address"
@@ -212,7 +169,8 @@ const Page = () => {
                       <strong>Phone:</strong> {bill.customerPhone}
                     </p>
                     <p className="text-xl">
-                      <strong>Created Date:</strong> {bill.createdDate}
+                      <strong>Created Date:</strong>
+                      {new Date(bill.createdDate).toLocaleDateString()}
                     </p>
                     <p className="mt-3 text-center">
                       <Badge className="bg-[var(--ring)] text-white">
@@ -246,6 +204,10 @@ const Page = () => {
                     </p>
                     <p className="text-xl">
                       <strong>Address:</strong> {bill.customerAddress}
+                    </p>
+                    <p className="text-xl">
+                      <strong>Created Date:</strong>{" "}
+                      {new Date(bill.createdDate).toLocaleDateString()}
                     </p>
                     <p className="text-xl">
                       <strong>Final Date:</strong> {bill.finalDate}
