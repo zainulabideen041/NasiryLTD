@@ -5,7 +5,7 @@ const baseURL = "https://nasiry-backend.vercel.app/auth";
 
 const initialState = {
   isAuthenticated: false,
-  isLoading: true,
+  isLoading: false,
   user: null,
 };
 

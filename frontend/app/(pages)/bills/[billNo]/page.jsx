@@ -178,7 +178,7 @@ const BillDetails = ({ params }) => {
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-[240px] justify-start text-left font-normal",
+                            "w-[240px] md:w-[150px] justify-start text-left font-normal",
                             !formData.date && "text-muted-foreground"
                           )}
                         >

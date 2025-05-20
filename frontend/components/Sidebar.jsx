@@ -10,12 +10,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "./DarkMode";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { logoutUser } from "@/redux/auth-slice";
 import Swal from "sweetalert2";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const dispatch = useDispatch();
 

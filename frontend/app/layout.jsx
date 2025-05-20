@@ -6,9 +6,15 @@ import { Providers } from "@/redux/provider";
 import "./globals.css";
 
 export const metadata = {
-  title: "My Next.js App",
-  description: "A modern web application built with Next.js and TailwindCSS.",
-  keywords: ["Next.js", "Tailwind", "Dark Mode", "Poppins", "SEO"],
+  title: "Nasiry Dashboard",
+  description: "Nasiry LTD Dashboard.",
+  keywords: [
+    "nasiry.ltd",
+    "nasiry ltd",
+    "nasiry meat shop",
+    "nasiry dashboard",
+    "meat shops uk",
+  ],
   themeColor: "#ffffff",
 };
 

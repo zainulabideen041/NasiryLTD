@@ -16,6 +16,10 @@ const billSchema = new mongoose.Schema({
   customerPhone: {
     type: String,
   },
+  createdDate: {
+    type: Date,
+    default: Date.now,
+  },
   finalDate: {
     type: Date,
   },
