@@ -32,6 +32,15 @@ const CreateBill = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating bill:", error);
+    if (
+      error.name === "MongooseError" &&
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message: "Database connection timeout. Please try again shortly.",
+        error: "CONNECTION_TIMEOUT",
+      });
+    }
     res.status(500).error({
       success: false,
       message: "Failed to create bill.",
@@ -53,7 +62,7 @@ const DisplayBill = async (req, res) => {
     // Fetch full invoice details using invoiceNo from the bill
     const fullInvoices = await Invoice.find({
       invoiceNo: { $in: bill.invoices },
-    });
+    }).lean();
 
     // Return bill details along with invoice details
     res.json({
@@ -65,6 +74,15 @@ const DisplayBill = async (req, res) => {
     });
   } catch (error) {
     console.error("Error Displaying bill:", error);
+    if (
+      error.name === "MongooseError" &&
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message: "Database connection timeout. Please try again shortly.",
+        error: "CONNECTION_TIMEOUT",
+      });
+    }
     res.status(500).json({
       success: false,
       message: "Failed to Display bill.",
@@ -75,7 +93,7 @@ const DisplayBill = async (req, res) => {
 
 const DisplayBills = async (req, res) => {
   try {
-    const bills = await Bill.find();
+    const bills = await Bill.find().lean();
 
     if (!bills || bills.length === 0) {
       return res.json("No Bills Found!");
@@ -85,7 +103,9 @@ const DisplayBills = async (req, res) => {
     const allInvoiceNos = bills.flatMap((bill) => bill.invoices);
 
     // Fetch all invoice details
-    const invoices = await Invoice.find({ invoiceNo: { $in: allInvoiceNos } });
+    const invoices = await Invoice.find({
+      invoiceNo: { $in: allInvoiceNos },
+    });
 
     // Map invoiceNo to invoice object for quick lookup
     const invoiceMap = {};
@@ -110,6 +130,15 @@ const DisplayBills = async (req, res) => {
     });
   } catch (error) {
     console.error("Error displaying bills:", error);
+    if (
+      error.name === "MongooseError" &&
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message: "Database connection timeout. Please try again shortly.",
+        error: "CONNECTION_TIMEOUT",
+      });
+    }
     res.status(500).json({
       success: false,
       message: "Failed to display bills.",
@@ -124,7 +153,7 @@ const UpdateBill = async (req, res) => {
     const { customerName, customerAddress, customerPhone, finalDate, status } =
       req.body;
 
-    const bill = await Bill.findOne({ billNo });
+    const bill = await Bill.findOne({ billNo }).lean();
 
     if (!bill) {
       return res.status(404).json({
@@ -149,6 +178,15 @@ const UpdateBill = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating bill:", error);
+    if (
+      error.name === "MongooseError" &&
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message: "Database connection timeout. Please try again shortly.",
+        error: "CONNECTION_TIMEOUT",
+      });
+    }
     res.status(500).json({
       success: false,
       message: "Failed to update bill.",
@@ -161,7 +199,7 @@ const DeleteBill = async (req, res) => {
   try {
     const { billNo } = req.body;
 
-    const bill = await Bill.findOne({ billNo });
+    const bill = await Bill.findOne({ billNo }).lean();
 
     if (!bill) {
       return res.status(404).json({
@@ -185,6 +223,15 @@ const DeleteBill = async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting bill:", error);
+    if (
+      error.name === "MongooseError" &&
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message: "Database connection timeout. Please try again shortly.",
+        error: "CONNECTION_TIMEOUT",
+      });
+    }
     res.status(500).json({
       success: false,
       message: "Failed to delete bill.",

@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import ActiveBills from "./active";
+import ClosedBills from "./closed";
 import { Input } from "@/components/ui/input";
 import { useDispatch } from "react-redux";
 import Loading from "@/components/Loading";
@@ -65,10 +65,16 @@ const Page = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    const { customerName, customerAddress, customerPhone } = formData;
+    if (!customerName || !customerAddress || !customerPhone) {
+      alert("Please fill all the fields.");
+      return;
+    }
+
     try {
       const res = await dispatch(createBill(formData));
       if (createBill.fulfilled.match(res)) {
-        setBills([...bills, res.payload]);
+        setBills((prev) => [...prev, res.payload]);
       }
       resetForm();
       setShowAddPopover(false);
@@ -103,6 +109,7 @@ const Page = () => {
                       <Label htmlFor="customerName">Customer</Label>
                       <Input
                         id="customerName"
+                        value={formData.customerName}
                         onChange={(e) =>
                           handleChange("customerName", e.target.value)
                         }
@@ -115,6 +122,7 @@ const Page = () => {
                       <Label htmlFor="customerAddress">Address</Label>
                       <Input
                         id="customerAddress"
+                        value={formData.customerAddress}
                         onChange={(e) =>
                           handleChange("customerAddress", e.target.value)
                         }
@@ -128,8 +136,9 @@ const Page = () => {
                       <Input
                         id="customerPhone"
                         type="tel"
+                        value={formData.customerPhone}
                         onChange={(e) =>
-                          handleChange("customerPhone", +e.target.value)
+                          handleChange("customerPhone", e.target.value)
                         }
                         className="col-span-2 h-8"
                         placeholder="Customer Phone"
@@ -151,82 +160,10 @@ const Page = () => {
           {bills.length > 0 ? (
             <>
               {/* Active Bills */}
-              {activeBills.length > 0 && (
-                <>
-                  <h1 className="text-2xl lg:text-4xl font-bold tracking-wide mt-5 ml-5">
-                    ACTIVE BILLS
-                  </h1>
-                  <div className="w-full flex flex-wrap">
-                    {activeBills.map((bill) => (
-                      <Link
-                        href={`/bills/${bill.billNo}`}
-                        key={bill.billNo}
-                        className="border hover:border-[var(--ring)] p-5 lg:p-6 w-full sm:w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[30%] rounded-lg shadow bg-white dark:hover:bg-gray-950 dark:bg-black m-3 lg:m-6 hover:bg-gray-50"
-                      >
-                        <p className="text-2xl lg:text-3xl mb-3 text-center font-bold">
-                          {bill.customerName}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Bill No:</strong> {bill.billNo}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Address:</strong> {bill.customerAddress}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Phone:</strong> {bill.customerPhone}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Created Date:</strong>
-                          {new Date(bill.createdDate).toLocaleDateString()}
-                        </p>
-                        <p className="mt-3 text-center">
-                          <Badge className="bg-[var(--ring)] text-white">
-                            {bill.status}
-                          </Badge>
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              )}
+              <ActiveBills activeBills={activeBills} />
 
               {/* Closed Bills */}
-              {closedBills.length > 0 && (
-                <>
-                  <h1 className="text-2xl lg:text-4xl font-bold tracking-wide mt-5 ml-5">
-                    CLOSED BILLS
-                  </h1>
-                  <div className="w-full flex flex-wrap">
-                    {closedBills.map((bill) => (
-                      <Link
-                        href={`/bills/${bill.billNo}`}
-                        key={bill.billNo}
-                        className="border hover:border-[var(--ring)] p-5 lg:p-6 w-full sm:w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] 2xl:w-[30%] rounded-lg shadow bg-white dark:hover:bg-gray-950 dark:bg-black m-3 lg:m-6 hover:bg-gray-50"
-                      >
-                        <p className="text-3xl mb-3 text-center font-bold">
-                          {bill.customerName}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Bill No:</strong> {bill.billNo}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Address:</strong> {bill.customerAddress}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Created Date:</strong>{" "}
-                          {new Date(bill.createdDate).toLocaleDateString()}
-                        </p>
-                        <p className="text-xl">
-                          <strong>Final Date:</strong> {bill.finalDate}
-                        </p>
-                        <p className="mt-3 text-center">
-                          <Badge variant="destructive">{bill.status}</Badge>
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              )}
+              <ClosedBills closedBills={closedBills} />
             </>
           ) : (
             <h1 className="text-2xl text-center mt-10 font-semibold">

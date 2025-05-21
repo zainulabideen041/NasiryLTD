@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+const { connectToDatabase } = require("./utils/db");
 const cors = require("cors");
 
 const authRouter = require("./routes/auth-routes");
@@ -9,11 +10,6 @@ const invoiceRouter = require("./routes/invoice-routes");
 
 const dotenv = require("dotenv");
 dotenv.config();
-
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((error) => console.log(error));
 
 const app = express();
 const PORT = process.env.PORT;
@@ -44,6 +40,12 @@ app.get("/", (req, res) => {
   res.json("Hello Server");
 });
 
-app.listen(PORT, () =>
-  console.log(`Server is now running on http://localhost:${PORT}`)
-);
+connectToDatabase()
+  .then(() => {
+    app.listen(PORT, () =>
+      console.log(`Server is now running on http://localhost:${PORT}`)
+    );
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database. Server not started.", error);
+  });

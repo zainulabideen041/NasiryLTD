@@ -1,13 +1,15 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
+// const { connectToDatabase } = require("../utils/db");
 
 // LOGIN USER CONTROLLER
 const login = async (req, res) => {
+  // await connectToDatabase();
   const { email, password } = req.body;
 
   try {
-    const user = await Admin.findOne({ email });
+    const user = await Admin.findOne({ email }).lean();
     if (!user)
       return res.json({
         success: false,
@@ -26,6 +28,8 @@ const login = async (req, res) => {
       {
         id: user._id,
         email: user.email,
+        name: user.name,
+        img: user.img,
       },
       process.env.JWT_SECRET,
       { expiresIn: "60m" }
@@ -50,6 +54,15 @@ const login = async (req, res) => {
       });
   } catch (error) {
     console.log(error);
+    if (
+      error.name === "MongooseError" &&
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message: "Database connection timeout. Please try again shortly.",
+        error: "CONNECTION_TIMEOUT",
+      });
+    }
     res.status(500).json({
       success: false,
       message: "An error occurred",
