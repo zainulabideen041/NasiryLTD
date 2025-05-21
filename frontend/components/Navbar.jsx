@@ -11,7 +11,7 @@ const Navbar = () => {
   // const logoSrc = theme === "dark" ? "/logo-white.png" : "/logo-black.png";
 
   return (
-    <nav className="flex flex-col">
+    <nav className="flex flex-col z-999">
       <main className="flex justify-center text-center items-center">
         <Image
           src="/hen.png"
@@ -44,7 +44,7 @@ const Navbar = () => {
           height={100}
           className="dark:invert mr-1 w-23 lg:w-30"
         />
-        <div className="hidden lg:block absolute right-15">
+        <div className="hidden lg:block absolute right-15 z-1000">
           <ModeToggle />
         </div>
       </main>

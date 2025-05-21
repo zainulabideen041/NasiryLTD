@@ -271,7 +271,7 @@ const BillDetails = ({ params }) => {
                   {invoice.date.split("T")[0]}
                 </TableCell>
                 <TableCell className="md:text-right font-extralight">
-                  ${invoice.amount}
+                  £{invoice.amount}
                 </TableCell>
               </TableRow>
             ))
@@ -283,7 +283,7 @@ const BillDetails = ({ params }) => {
           <TableRow className="flex justify-between">
             <TableCell colSpan={2}>Total</TableCell>
             <TableCell className="text-right font-semibold">
-              ${totalAmount}
+              £{totalAmount}
             </TableCell>
           </TableRow>
         </TableFooter>

@@ -9,49 +9,36 @@ const initialState = {
   user: null,
 };
 
-export const loginUser = createAsyncThunk(
-  "/auth/login",
+export const loginUser = createAsyncThunk("/auth/login", async (formData) => {
+  const response = await axios.post(`${baseURL}/login`, formData, {
+    withCredentials: true,
+  });
 
-  async (formData) => {
-    const response = await axios.post(`${baseURL}/login`, formData, {
+  return response.data;
+});
+
+export const logoutUser = createAsyncThunk("/auth/logout", async () => {
+  const response = await axios.post(
+    `${baseURL}/logout`,
+    {},
+    {
       withCredentials: true,
-    });
+    }
+  );
 
-    return response.data;
-  }
-);
+  return response.data;
+});
 
-export const logoutUser = createAsyncThunk(
-  "/auth/logout",
+export const checkAuth = createAsyncThunk("/auth/checkauth", async () => {
+  const response = await axios.get(`${baseURL}/check-auth`, {
+    withCredentials: true,
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+    },
+  });
 
-  async () => {
-    const response = await axios.post(
-      `${baseURL}/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-
-    return response.data;
-  }
-);
-
-export const checkAuth = createAsyncThunk(
-  "/auth/checkauth",
-
-  async () => {
-    const response = await axios.get(`${baseURL}/check-auth`, {
-      withCredentials: true,
-      headers: {
-        "Cache-Control":
-          "no-store, no-cache, must-revalidate, proxy-revalidate",
-      },
-    });
-
-    return response.data;
-  }
-);
+  return response.data;
+});
 
 const authSlice = createSlice({
   name: "auth",

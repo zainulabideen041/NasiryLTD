@@ -157,4 +157,46 @@ const UpdateBill = async (req, res) => {
   }
 };
 
-module.exports = { CreateBill, DisplayBill, DisplayBills, UpdateBill };
+const DeleteBill = async (req, res) => {
+  try {
+    const { billNo } = req.body;
+
+    const bill = await Bill.findOne({ billNo });
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        message: "Bill not found.",
+      });
+    }
+
+    if (bill.invoices && bill.invoices.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Bill having Invoices cannot be deleted.",
+      });
+    }
+
+    await Bill.deleteOne({ billNo });
+
+    res.json({
+      success: true,
+      message: "Bill deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting bill:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete bill.",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  CreateBill,
+  DisplayBill,
+  DisplayBills,
+  UpdateBill,
+  DeleteBill,
+};

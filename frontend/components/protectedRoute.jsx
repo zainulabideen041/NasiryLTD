@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import Loading from "@/components/Loading";
+// import Loading from "@/components/Loading";
 import { checkAuth } from "@/redux/auth-slice";
 
 const ProtectedRoute = ({ children }) => {
@@ -45,9 +45,9 @@ const ProtectedRoute = ({ children }) => {
     return (
       <>
         {children}
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+        {/* <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
           <Loading />
-        </div>
+        </div> */}
       </>
     );
   }
