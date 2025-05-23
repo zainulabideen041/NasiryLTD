@@ -9,7 +9,7 @@ const LayoutStructure = ({ children }) => {
 
   return (
     <div className="flex flex-col">
-      <nav className="sticky top-0 bg-[var(--background)]">
+      <nav className="sticky top-0 bg-[var(--background)] z-2">
         <Navbar />
       </nav>
       <div

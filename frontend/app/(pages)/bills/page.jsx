@@ -1,19 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import ActiveBills from "./active";
 import ClosedBills from "./closed";
-import { Input } from "@/components/ui/input";
 import { useDispatch } from "react-redux";
 import Loading from "@/components/Loading";
 import { useEffect, useState } from "react";
 import { getAllBills, createBill } from "@/redux/bill-slice";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import CreateBill from "./createBill";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -67,10 +60,12 @@ const Page = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const { customerName, customerAddress, customerPhone, totalAmount } =
       formData;
     if (!customerName || !customerAddress || !customerPhone || !totalAmount) {
       alert("Please fill all the fields.");
+      setLoading(false);
       return;
     }
 
@@ -80,8 +75,10 @@ const Page = () => {
         setBills((prev) => [...prev, res.payload]);
       }
       resetForm();
+      setLoading(false);
       setShowAddPopover(false);
     } catch (error) {
+      setLoading(false);
       console.error("An Error Occurred:", error);
     }
   };
@@ -94,85 +91,17 @@ const Page = () => {
         </div>
       ) : (
         <main className="flex flex-col w-full">
-          <Popover open={showAddPopover} onOpenChange={setShowAddPopover}>
-            <PopoverTrigger asChild>
-              <Button
-                onClick={resetForm}
-                className="hover:cursor-pointer mt-3 ml-4 mr-4 bg-[var(--ring)] text-white text-xl"
-              >
-                Create New Bill
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[44vh] md:w-[74vh] xl:w-[100vh]">
-              <div className="grid gap-4">
-                <h4 className="font-bold text-lg">Create New Bill</h4>
-                <div className="grid gap-2">
-                  <div className="flex flex-col lg:flex-row flex-wrap justify-around">
-                    <div className="flex items-center gap-2 p-5">
-                      <Label htmlFor="customerName">Customer</Label>
-                      <Input
-                        id="customerName"
-                        value={formData.customerName}
-                        onChange={(e) =>
-                          handleChange("customerName", e.target.value)
-                        }
-                        className="col-span-2 h-8"
-                        placeholder="Customer Name"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2 p-5">
-                      <Label htmlFor="customerAddress">Address</Label>
-                      <Input
-                        id="customerAddress"
-                        value={formData.customerAddress}
-                        onChange={(e) =>
-                          handleChange("customerAddress", e.target.value)
-                        }
-                        className="col-span-2 h-8"
-                        placeholder="Customer Address"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2 p-5">
-                      <Label htmlFor="customerPhone">Phone</Label>
-                      <Input
-                        id="customerPhone"
-                        type="tel"
-                        value={formData.customerPhone}
-                        onChange={(e) =>
-                          handleChange("customerPhone", e.target.value)
-                        }
-                        className="col-span-2 h-8"
-                        placeholder="Customer Phone"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2 p-5">
-                      <Label htmlFor="totalAmount">Total Amount</Label>
-                      <Input
-                        id="totalAmount"
-                        type="number"
-                        value={formData.totalAmount}
-                        onChange={(e) =>
-                          handleChange("totalAmount", e.target.value)
-                        }
-                        className="col-span-2 h-8"
-                        placeholder="Total Amount to Receive"
-                      />
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={handleCreate}
-                    className="col-span-3 mt-2 bg-[var(--ring)] text-white hover:cursor-pointer"
-                  >
-                    Create Bill
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          {/* create bill popover  */}
+          <CreateBill
+            showAddPopover={showAddPopover}
+            setShowAddPopover={setShowAddPopover}
+            resetForm={resetForm}
+            formData={formData}
+            handleChange={handleChange}
+            handleCreate={handleCreate}
+            loading={loading}
+            setLoading={setLoading}
+          />
 
           {bills.length > 0 ? (
             <>

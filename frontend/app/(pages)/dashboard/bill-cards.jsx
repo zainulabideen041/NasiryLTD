@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ShieldCheck, ShieldX, Newspaper } from "lucide-react";
+import { ShieldCheck, ShieldX, Newspaper, Users } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { getAllBills } from "@/redux/bill-slice";
 import Loading from "@/components/Loading";
@@ -12,8 +12,10 @@ const billcards = () => {
   const activeCountRef = useRef(null);
   const totalCountRef = useRef(null);
   const closedCountRef = useRef(null);
+  const customerCountRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [customerCount, setCustomerCount] = useState(0);
   const [totalBillCount, setTotalBillCount] = useState(0);
   const [activeBillCount, setActiveBillCount] = useState(0);
   const [closedBillCount, setClosedBillCount] = useState(0);
@@ -31,18 +33,38 @@ const billcards = () => {
           let active = 0;
           let closed = 0;
 
+          const seenNames = new Set();
+          const seenPhones = new Set();
+          let uniqueCustomerCount = 0;
+
           for (const bill of bills) {
-            if (bill.status === "Active") active++;
-            else if (bill.status === "Closed") closed++;
+            // Count active/closed
+            if (bill.status === "active") active++;
+            else if (bill.status === "closed") closed++;
+
+            // Check if this customer is already known
+            const name = bill.customerName?.trim().toLowerCase();
+            const phone = bill.customerPhone?.trim();
+
+            const isDuplicate =
+              (name && seenNames.has(name)) || (phone && seenPhones.has(phone));
+
+            if (!isDuplicate) {
+              uniqueCustomerCount++;
+              if (name) seenNames.add(name);
+              if (phone) seenPhones.add(phone);
+            }
           }
 
           setTotalBillCount(bills.length);
           setActiveBillCount(active);
           setClosedBillCount(closed);
+          setCustomerCount(uniqueCustomerCount); // ✅ final count
         } else {
           setTotalBillCount(0);
           setActiveBillCount(0);
           setClosedBillCount(0);
+          setCustomerCount(0);
         }
       } catch (error) {
         console.error("Error fetching bills:", error);
@@ -61,6 +83,7 @@ const billcards = () => {
       !isLoading &&
       activeCountRef.current &&
       closedCountRef.current &&
+      customerCountRef.current &&
       totalCountRef.current
     ) {
       const animateCount = (ref, value) => {
@@ -82,9 +105,16 @@ const billcards = () => {
 
       animateCount(activeCountRef, activeBillCount);
       animateCount(totalCountRef, totalBillCount);
+      animateCount(customerCountRef, customerCount);
       animateCount(closedCountRef, closedBillCount);
     }
-  }, [activeBillCount, closedBillCount, totalBillCount, isLoading]);
+  }, [
+    activeBillCount,
+    closedBillCount,
+    totalBillCount,
+    customerCount,
+    isLoading,
+  ]);
 
   const handleMouseMove = (e, boxId) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -127,12 +157,12 @@ const billcards = () => {
               <h2 className="mb-3 text-xl font-semibold">Active Bills</h2>
               <p
                 ref={activeCountRef}
-                className="text-5xl font-bold text-gray-800 dark:text-white"
+                className="text-6xl pt-5 font-bold text-gray-800 dark:text-white"
               >
                 0
               </p>
             </div>
-            <ShieldCheck size={80} />
+            <ShieldCheck size={100} />
           </div>
         </div>
 
@@ -157,12 +187,12 @@ const billcards = () => {
               <h2 className="mb-3 text-xl font-semibold">Closed Bills</h2>
               <p
                 ref={closedCountRef}
-                className="text-5xl font-bold text-gray-800 dark:text-white"
+                className="text-6xl pt-5 font-bold text-gray-800 dark:text-white"
               >
                 0
               </p>
             </div>
-            <ShieldX size={80} />
+            <ShieldX size={100} />
           </div>
         </div>
 
@@ -187,12 +217,42 @@ const billcards = () => {
               <h2 className="mb-3 text-xl font-semibold">Total Bills</h2>
               <p
                 ref={totalCountRef}
-                className="text-5xl font-bold text-gray-800 dark:text-white"
+                className="text-6xl pt-5 font-bold text-gray-800 dark:text-white"
               >
                 0
               </p>
             </div>
-            <Newspaper size={80} />
+            <Newspaper size={100} />
+          </div>
+        </div>
+
+        {/* Customer Count Box  */}
+        <div
+          onMouseMove={(e) => handleMouseMove(e, "customer")}
+          onMouseLeave={() => setHoveredBox(null)}
+          className="relative border p-5 lg:p-6 w-[90%] md:w-[50%] lg:w-[40%] xl:w-[35%] 2xl:w-[25%] rounded-lg shadow bg-white dark:bg-black m-5 lg:m-6 overflow-hidden"
+        >
+          {hoveredBox === "customer" && (
+            <div
+              className="pointer-events-none absolute w-40 h-40 rounded-full dark:bg-white/10 bg-black/10 backdrop-blur-xl blur-3xl transition-all duration-100 z-0"
+              style={{
+                top: cursorPos.y - 80,
+                left: cursorPos.x - 80,
+              }}
+            />
+          )}
+
+          <div className="flex justify-between cursor-default select-none relative z-10">
+            <div>
+              <h2 className="mb-3 text-xl font-semibold">Total Customers</h2>
+              <p
+                ref={customerCountRef}
+                className="text-6xl pt-5 font-bold text-gray-800 dark:text-white"
+              >
+                0
+              </p>
+            </div>
+            <Users size={100} />
           </div>
         </div>
       </div>

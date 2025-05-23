@@ -7,6 +7,7 @@ import {
   ChartNoAxesCombined,
   UserRoundCog,
   LogOut,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "./DarkMode";
@@ -45,6 +46,11 @@ const Sidebar = () => {
       label: "Dashboard",
     },
     { href: "/bills", icon: <Receipt size={30} />, label: "Bills" },
+    {
+      href: "/customers",
+      icon: <Users size={30} />,
+      label: "Customers",
+    },
     {
       href: "/analytics",
       icon: <ChartNoAxesCombined size={30} />,

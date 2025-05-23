@@ -1,5 +1,0 @@
-Refactoring
-
-Edit bill button
-
-print bill option on each invoice received
