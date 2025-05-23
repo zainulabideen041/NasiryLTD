@@ -30,6 +30,8 @@ const AddInvoice = async (req, res) => {
 
     await invoice.save();
 
+    bill.remainingAmount -= amount;
+    bill.receivedAmount += amount;
     bill.invoices.push(invoice.invoiceNo);
     await bill.save();
 
@@ -68,11 +70,28 @@ const UpdateInvoice = async (req, res) => {
       });
     }
 
-    // Update only the provided fields
     if (date !== undefined) invoice.date = date;
     if (amount !== undefined) invoice.amount = amount;
 
     await invoice.save();
+
+    const bill = await Bill.findOne({ billNo: invoice.billNo });
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        message: "Bill does not exist.",
+      });
+    }
+
+    const invoices = await Invoice.find({ billNo: bill.billNo });
+
+    const totalReceived = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+
+    bill.receivedAmount = totalReceived;
+    bill.remainingAmount = bill.totalAmount - totalReceived;
+
+    await bill.save();
 
     res.json({
       success: true,

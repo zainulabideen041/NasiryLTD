@@ -19,7 +19,7 @@ const LayoutStructure = ({ children }) => {
           <></>
         ) : (
           <div className="w-[15%]">
-            <div className="w-full sticky top-60 lg:top-50 bg-[var(--background)] z-100">
+            <div className="w-full sticky top-60 lg:top-50 bg-[var(--background)]">
               <Sidebar />
             </div>
           </div>

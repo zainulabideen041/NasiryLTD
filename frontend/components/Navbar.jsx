@@ -44,7 +44,7 @@ const Navbar = () => {
           height={100}
           className="dark:invert mr-1 w-23 lg:w-30"
         />
-        <div className="hidden lg:block absolute right-15 z-1000">
+        <div className="hidden lg:block absolute right-15">
           <ModeToggle />
         </div>
       </main>

@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { use } from "react";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import Loading from "@/components/Loading";
 import { useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
-import { getBillByNo } from "@/redux/bill-slice";
+import { getBillByNo, deleteBill, closeBill } from "@/redux/bill-slice";
 import {
   addInvoice,
   deleteInvoice,
@@ -35,6 +36,9 @@ import {
 
 const BillDetails = ({ params }) => {
   const { billNo } = use(params);
+  const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
 
   const dispatch = useDispatch();
   const [bill, setBill] = useState({});
@@ -45,8 +49,10 @@ const BillDetails = ({ params }) => {
       const resultAction = await dispatch(getBillByNo(billNo));
       if (getBillByNo.fulfilled.match(resultAction)) {
         const billData = resultAction.payload;
+        console.log(billData);
         setBill(billData);
         setInvoices(billData.invoices || []);
+        setLoading(false);
       } else {
         console.error("Failed to fetch bill:", resultAction.error);
       }
@@ -56,11 +62,6 @@ const BillDetails = ({ params }) => {
   }, [billNo, dispatch]);
 
   if (!bill) return notFound();
-
-  const totalAmount = invoices.reduce(
-    (sum, invoice) => sum + (invoice.amount || 0),
-    0
-  );
 
   const [editInvoice, setEditInvoice] = useState(null);
   const [showAddPopover, setShowAddPopover] = useState(false);
@@ -132,7 +133,7 @@ const BillDetails = ({ params }) => {
     setEditInvoice(null);
   };
 
-  const handleDelete = async () => {
+  const invoiceDelete = async () => {
     try {
       const resultAction = await dispatch(deleteInvoice(formData.invoiceNo));
       if (deleteInvoice.fulfilled.match(resultAction)) {
@@ -148,6 +149,44 @@ const BillDetails = ({ params }) => {
     setEditInvoice(null);
   };
 
+  const billDelete = async () => {
+    try {
+      setLoading(true);
+      const resultAction = await dispatch(deleteBill(billNo));
+      if (deleteBill.fulfilled.match(resultAction)) {
+        setBill(bill.filter((bill) => bill.billNo !== formData.billNo));
+      }
+      setLoading(false);
+      router.push("/bills");
+    } catch (error) {
+      console.error("Failed to delete invoice:", error);
+      setLoading(false);
+    }
+  };
+
+  const billClose = async () => {
+    try {
+      setLoading(true);
+      const resultAction = await dispatch(closeBill(billNo));
+      if (closeBill.fulfilled.match(resultAction)) {
+        setBill(bill.filter((bill) => bill.billNo !== formData.billNo));
+      }
+      setLoading(false);
+      router.push("/bills");
+    } catch (error) {
+      console.error("Failed to delete invoice:", error);
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="h-[80vh] flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full p-2 md:p-4">
       <h1 className="text-2xl lg:text-4xl lg:font-extrabold font-bold tracking-wide mt-5 ml-5">
@@ -156,98 +195,104 @@ const BillDetails = ({ params }) => {
 
       {/* --- Add New Invoice Button with Popover --- */}
       <header className="flex justify-center p-5">
-        <Popover open={showAddPopover} onOpenChange={setShowAddPopover}>
-          <PopoverTrigger asChild>
-            <Button
-              onClick={resetForm}
-              className="hover:cursor-pointer bg-[var(--ring)] text-white text-xl"
-            >
-              Add New Invoice
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[44vh] md:w-[74vh] xl:w-[100vh]">
-            <div className="grid gap-4">
-              <h4 className="font-bold text-lg">Add New Invoice</h4>
-              <div className="grid gap-2">
-                <div className="flex flex-col lg:flex-row justify-between">
-                  {/* Date Picker */}
-                  <div className="flex items-center gap-2 p-5">
-                    <Label htmlFor="date">Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-[240px] md:w-[150px] justify-start text-left font-normal",
-                            !formData.date && "text-muted-foreground"
-                          )}
+        {bill.status === "active" ? (
+          <Popover open={showAddPopover} onOpenChange={setShowAddPopover}>
+            <PopoverTrigger asChild>
+              <Button
+                onClick={resetForm}
+                className="hover:cursor-pointer bg-[var(--ring)] text-white text-xl"
+              >
+                Add New Invoice
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[44vh] md:w-[74vh] xl:w-[100vh]">
+              <div className="grid gap-4">
+                <h4 className="font-bold text-lg">Add New Invoice</h4>
+                <div className="grid gap-2">
+                  <div className="flex flex-col lg:flex-row justify-between">
+                    {/* Date Picker */}
+                    <div className="flex items-center gap-2 p-5">
+                      <Label htmlFor="date">Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] md:w-[150px] justify-start text-left font-normal",
+                              !formData.date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.date ? (
+                              formData.date
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto p-0 text-left"
+                          align="start"
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {formData.date ? (
-                            formData.date
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-auto p-0 text-left"
-                        align="start"
-                      >
-                        <Calendar
-                          mode="single"
-                          onSelect={(selectedDate) => {
-                            if (selectedDate) {
-                              handleChange(
-                                "date",
-                                format(selectedDate, "yyyy-MM-dd")
-                              );
-                            }
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                          <Calendar
+                            mode="single"
+                            onSelect={(selectedDate) => {
+                              if (selectedDate) {
+                                handleChange(
+                                  "date",
+                                  format(selectedDate, "yyyy-MM-dd")
+                                );
+                              }
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Invoice No */}
+                    <div className="flex items-center gap-2 p-5">
+                      <Label htmlFor="invoiceNo">Invoice</Label>
+                      <Input
+                        id="invoiceNo"
+                        onChange={(e) =>
+                          handleChange("invoiceNo", e.target.value)
+                        }
+                        className="col-span-2 h-8"
+                      />
+                    </div>
+
+                    {/* Amount */}
+                    <div className="flex items-center gap-2 p-5">
+                      <Label htmlFor="amount">Amount</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        onChange={(e) =>
+                          handleChange("amount", +e.target.value)
+                        }
+                        className="col-span-2 h-8"
+                      />
+                    </div>
                   </div>
 
-                  {/* Invoice No */}
-                  <div className="flex items-center gap-2 p-5">
-                    <Label htmlFor="invoiceNo">Invoice</Label>
-                    <Input
-                      id="invoiceNo"
-                      onChange={(e) =>
-                        handleChange("invoiceNo", e.target.value)
-                      }
-                      className="col-span-2 h-8"
-                    />
-                  </div>
-
-                  {/* Amount */}
-                  <div className="flex items-center gap-2 p-5">
-                    <Label htmlFor="amount">Amount</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      onChange={(e) => handleChange("amount", +e.target.value)}
-                      className="col-span-2 h-8"
-                    />
-                  </div>
+                  <Button
+                    onClick={handleAdd}
+                    className="col-span-3 mt-2 bg-[var(--ring)] text-white hover:cursor-pointer"
+                  >
+                    Add Invoice
+                  </Button>
                 </div>
-
-                <Button
-                  onClick={handleAdd}
-                  className="col-span-3 mt-2 bg-[var(--ring)] text-white hover:cursor-pointer"
-                >
-                  Add Invoice
-                </Button>
               </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <></>
+        )}
       </header>
 
       {/* --- Invoice Table --- */}
-      <Table className="w-[50vh] md:w-[70vh] lg:w-[100vh] text-2xl ml-2 md:ml-5">
+      <Table className="w-[50vh] md:w-[70vh] lg:w-[110vh] text-xl ml-2 md:ml-5">
         <TableCaption>List of invoices for this bill</TableCaption>
         <TableHeader>
           <TableRow className="flex justify-between">
@@ -281,9 +326,21 @@ const BillDetails = ({ params }) => {
         </TableBody>
         <TableFooter>
           <TableRow className="flex justify-between">
-            <TableCell colSpan={2}>Total</TableCell>
+            <TableCell colSpan={2}>Amount Received by Invoices</TableCell>
             <TableCell className="text-right font-semibold">
-              £{totalAmount}
+              £ {bill.receivedAmount}
+            </TableCell>
+          </TableRow>
+          <TableRow className="flex justify-between">
+            <TableCell colSpan={2}>Total Amount to Receive</TableCell>
+            <TableCell className="text-right font-semibold">
+              £ {bill.totalAmount}
+            </TableCell>
+          </TableRow>
+          <TableRow className="flex justify-between">
+            <TableCell colSpan={2}>Remaining Amount</TableCell>
+            <TableCell className="text-right font-semibold text-red-700">
+              £ {bill.remainingAmount}
             </TableCell>
           </TableRow>
         </TableFooter>
@@ -377,7 +434,7 @@ const BillDetails = ({ params }) => {
                 </Button>
                 <Button
                   variant="destructive"
-                  onClick={handleDelete}
+                  onClick={invoiceDelete}
                   className="col-span-3 mt-2 hover:cursor-pointer"
                 >
                   Delete Invoice
@@ -387,11 +444,24 @@ const BillDetails = ({ params }) => {
           </PopoverContent>
         </Popover>
       )}
-      <Button
-        variant="destructive"
-        className="hover:cursor-pointer bg-[var(--ring)] pl-5 pr-5 w-full sm:w-[70%] ml-1 lg:w-[50%] mr-2 mt-5 text-white text-xl"
-      >
-        Close the Bill
+      {invoices.length > 0 ? (
+        <Button
+          onClick={billClose}
+          className="hover:cursor-pointer bg-[var(--ring)] pl-5 pr-5 w-full sm:w-[70%] ml-1 lg:w-[60%] mr-2 mt-5 text-white text-xl"
+        >
+          Close Bill
+        </Button>
+      ) : (
+        <Button
+          onClick={billDelete}
+          className="hover:cursor-pointer bg-[var(--ring)] pl-5 pr-5 w-full sm:w-[70%] ml-1 lg:w-[60%] mr-2 mt-5 text-white text-xl"
+        >
+          Delete Bill
+        </Button>
+      )}
+
+      <Button className="hover:cursor-pointer bg-[var(--ring)] pl-5 pr-5 w-full sm:w-[70%] ml-1 lg:w-[60%] mr-2 mt-5 text-white text-xl">
+        Edit Bill
       </Button>
     </div>
   );

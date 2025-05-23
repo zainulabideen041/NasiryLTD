@@ -23,10 +23,19 @@ const billSchema = new mongoose.Schema({
   finalDate: {
     type: Date,
   },
+  totalAmount: {
+    type: Number,
+  },
+  remainingAmount: {
+    type: Number,
+  },
+  receivedAmount: {
+    type: Number,
+  },
   status: {
     type: String,
-    default: "Active",
-    enum: ["Active", "Closed"],
+    default: "active",
+    enum: ["active", "closed"],
   },
   invoices: [
     {

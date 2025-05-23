@@ -23,6 +23,7 @@ const Page = () => {
     customerName: "",
     customerAddress: "",
     customerPhone: "",
+    totalAmount: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -54,6 +55,7 @@ const Page = () => {
       customerName: "",
       customerAddress: "",
       customerPhone: "",
+      totalAmount: "",
     });
 
   const handleChange = (field, value) => {
@@ -65,8 +67,9 @@ const Page = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    const { customerName, customerAddress, customerPhone } = formData;
-    if (!customerName || !customerAddress || !customerPhone) {
+    const { customerName, customerAddress, customerPhone, totalAmount } =
+      formData;
+    if (!customerName || !customerAddress || !customerPhone || !totalAmount) {
       alert("Please fill all the fields.");
       return;
     }
@@ -142,6 +145,20 @@ const Page = () => {
                         }
                         className="col-span-2 h-8"
                         placeholder="Customer Phone"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2 p-5">
+                      <Label htmlFor="totalAmount">Total Amount</Label>
+                      <Input
+                        id="totalAmount"
+                        type="number"
+                        value={formData.totalAmount}
+                        onChange={(e) =>
+                          handleChange("totalAmount", e.target.value)
+                        }
+                        className="col-span-2 h-8"
+                        placeholder="Total Amount to Receive"
                       />
                     </div>
                   </div>

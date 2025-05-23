@@ -3,9 +3,10 @@ const Invoice = require("../models/Invoice");
 
 const CreateBill = async (req, res) => {
   try {
-    const { customerName, customerAddress, customerPhone } = req.body;
+    const { customerName, customerAddress, customerPhone, totalAmount } =
+      req.body;
 
-    if (!customerName || !customerAddress) {
+    if (!customerName || !customerAddress || customerPhone || totalAmount) {
       return res.status(400).json({
         success: false,
         message: "All required fields must be provided.",
@@ -21,6 +22,8 @@ const CreateBill = async (req, res) => {
       customerName,
       customerAddress,
       customerPhone,
+      totalAmount,
+      remainingAmount: totalAmount,
     });
 
     await bill.save();
@@ -62,7 +65,7 @@ const DisplayBill = async (req, res) => {
     // Fetch full invoice details using invoiceNo from the bill
     const fullInvoices = await Invoice.find({
       invoiceNo: { $in: bill.invoices },
-    }).lean();
+    });
 
     // Return bill details along with invoice details
     res.json({
@@ -93,7 +96,7 @@ const DisplayBill = async (req, res) => {
 
 const DisplayBills = async (req, res) => {
   try {
-    const bills = await Bill.find().lean();
+    const bills = await Bill.find();
 
     if (!bills || bills.length === 0) {
       return res.json("No Bills Found!");
@@ -150,10 +153,16 @@ const DisplayBills = async (req, res) => {
 const UpdateBill = async (req, res) => {
   try {
     const { billNo } = req.params;
-    const { customerName, customerAddress, customerPhone, finalDate, status } =
-      req.body;
+    const {
+      customerName,
+      customerAddress,
+      customerPhone,
+      finalDate,
+      status,
+      totalAmount,
+    } = req.body;
 
-    const bill = await Bill.findOne({ billNo }).lean();
+    const bill = await Bill.findOne({ billNo });
 
     if (!bill) {
       return res.status(404).json({
@@ -161,6 +170,19 @@ const UpdateBill = async (req, res) => {
         message: "Bill not found.",
       });
     }
+
+    const invoices = await Invoice.find({ billNo: bill.billNo });
+    const totalReceived = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+
+    if (totalAmount < totalReceived) {
+      return res.status(400).json({
+        success: false,
+        message: `total amount (${totalAmount}) cannot be less than received amount (${totalReceived}).`,
+      });
+    }
+
+    bill.totalAmount = totalAmount;
+    bill.remainingAmount = totalAmount - totalReceived;
 
     // Update fields if they are provided in request body
     if (customerName) bill.customerName = customerName;
@@ -195,11 +217,59 @@ const UpdateBill = async (req, res) => {
   }
 };
 
+const CloseBill = async (req, res) => {
+  try {
+    const { billNo } = req.body;
+
+    const bill = await Bill.findOne({ billNo });
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        message: "Bill not found.",
+      });
+    }
+
+    if (bill.status === "closed") {
+      return res.status(404).json({
+        success: false,
+        message: "Bill is already closed.",
+      });
+    }
+
+    bill.status = "closed";
+
+    await bill.save();
+
+    res.json({
+      success: true,
+      message: "Bill Closed Successfully.",
+      bill,
+    });
+  } catch (error) {
+    console.error("Error updating bill:", error);
+    if (
+      error.name === "MongooseError" &&
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        message: "Database connection timeout. Please try again shortly.",
+        error: "CONNECTION_TIMEOUT",
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: "Failed to update bill.",
+      error: error.message,
+    });
+  }
+};
+
 const DeleteBill = async (req, res) => {
   try {
     const { billNo } = req.body;
 
-    const bill = await Bill.findOne({ billNo }).lean();
+    const bill = await Bill.findOne({ billNo });
 
     if (!bill) {
       return res.status(404).json({
@@ -246,4 +316,5 @@ module.exports = {
   DisplayBills,
   UpdateBill,
   DeleteBill,
+  CloseBill,
 };

@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const { connectToDatabase } = require("./utils/db");
 const cors = require("cors");

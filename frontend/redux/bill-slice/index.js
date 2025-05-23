@@ -16,7 +16,6 @@ export const createBill = createAsyncThunk(
   async (billData, { rejectWithValue }) => {
     try {
       const res = await axios.post(`${baseURL}/create`, billData);
-      console.log(res);
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -56,6 +55,32 @@ export const updateBill = createAsyncThunk(
   async ({ billNo, updatedData }, { rejectWithValue }) => {
     try {
       const res = await axios.put(`${baseURL}/update/${billNo}`, updatedData);
+      return res.data.bill;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+//Delete bill
+export const deleteBill = createAsyncThunk(
+  "bills/deleteBill",
+  async (billNo, { rejectWithValue }) => {
+    try {
+      const res = await axios.delete(`${baseURL}/delete`, billNo);
+      return billNo;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+//Close bill
+export const closeBill = createAsyncThunk(
+  "bills/closeBill",
+  async (billNo, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(`${baseURL}/close`, billNo);
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -124,6 +149,40 @@ const billSlice = createSlice({
         );
       })
       .addCase(updateBill.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      //Delete
+      .addCase(deleteBill.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteBill.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const deletedBillNo = action.payload;
+        state.bills = state.bills.filter(
+          (bill) => bill.billNo !== deletedBillNo
+        );
+      })
+      .addCase(deleteBill.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      //Close
+      .addCase(closeBill.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(closeBill.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const updatedBill = action.payload;
+        state.bills = state.bills.map((bill) =>
+          bill.billNo === updatedBill.billNo ? updatedBill : bill
+        );
+      })
+      .addCase(closeBill.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
