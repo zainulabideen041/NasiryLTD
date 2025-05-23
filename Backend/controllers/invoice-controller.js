@@ -9,6 +9,8 @@ const AddInvoice = async (req, res) => {
       return res.json("All Fields are Required!");
     }
 
+    const Invoice_amount = Number(amount);
+
     const bill = await Bill.findOne({ billNo });
 
     if (!bill) {
@@ -24,14 +26,14 @@ const AddInvoice = async (req, res) => {
     const invoice = new Invoice({
       invoiceNo,
       date,
-      amount,
+      amount: Invoice_amount,
       billNo,
     });
 
     await invoice.save();
 
-    bill.remainingAmount -= amount;
-    bill.receivedAmount += amount;
+    bill.remainingAmount -= Invoice_amount;
+    bill.receivedAmount += Invoice_amount;
     bill.invoices.push(invoice.invoiceNo);
     await bill.save();
 
@@ -71,7 +73,17 @@ const UpdateInvoice = async (req, res) => {
     }
 
     if (date !== undefined) invoice.date = date;
-    if (amount !== undefined) invoice.amount = amount;
+
+    if (amount !== undefined) {
+      const numericAmount = Number(amount);
+      if (isNaN(numericAmount)) {
+        return res.status(400).json({
+          success: false,
+          message: "Amount must be a valid number.",
+        });
+      }
+      invoice.amount = numericAmount;
+    }
 
     await invoice.save();
 
@@ -86,7 +98,10 @@ const UpdateInvoice = async (req, res) => {
 
     const invoices = await Invoice.find({ billNo: bill.billNo });
 
-    const totalReceived = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const totalReceived = invoices.reduce(
+      (sum, inv) => sum + Number(inv.amount || 0),
+      0
+    );
 
     bill.receivedAmount = totalReceived;
     bill.remainingAmount = bill.totalAmount - totalReceived;
@@ -123,7 +138,7 @@ const DeleteInvoice = async (req, res) => {
 
     // Remove invoice reference from the Bill as well
     await Bill.updateOne(
-      { billNo: invoice.bill },
+      { billNo: invoice.billNo },
       { $pull: { invoices: invoice.invoiceNo } }
     );
 

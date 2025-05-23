@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// const baseURL = "http://localhost:7000/bill";
 const baseURL = "https://nasiry-backend.vercel.app/bill";
 
 const initialState = {
@@ -67,7 +68,7 @@ export const deleteBill = createAsyncThunk(
   "bills/deleteBill",
   async (billNo, { rejectWithValue }) => {
     try {
-      const res = await axios.delete(`${baseURL}/delete`, billNo);
+      await axios.delete(`${baseURL}/delete/${billNo}`);
       return billNo;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -80,7 +81,7 @@ export const closeBill = createAsyncThunk(
   "bills/closeBill",
   async (billNo, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${baseURL}/close`, billNo);
+      const res = await axios.post(`${baseURL}/close/${billNo}`);
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

@@ -49,7 +49,6 @@ const BillDetails = ({ params }) => {
       const resultAction = await dispatch(getBillByNo(billNo));
       if (getBillByNo.fulfilled.match(resultAction)) {
         const billData = resultAction.payload;
-        console.log(billData);
         setBill(billData);
         setInvoices(billData.invoices || []);
         setLoading(false);
@@ -102,8 +101,14 @@ const BillDetails = ({ params }) => {
     try {
       const resultAction = await dispatch(addInvoice(formData));
       if (addInvoice.fulfilled.match(resultAction)) {
-        // Update local state with the new invoice
         setInvoices([...invoices, resultAction.payload]);
+      }
+      const Action = await dispatch(getBillByNo(billNo));
+      if (getBillByNo.fulfilled.match(Action)) {
+        const billData = Action.payload;
+        setBill(billData);
+        setInvoices(billData.invoices || []);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Failed to add invoice:", error);
@@ -152,10 +157,7 @@ const BillDetails = ({ params }) => {
   const billDelete = async () => {
     try {
       setLoading(true);
-      const resultAction = await dispatch(deleteBill(billNo));
-      if (deleteBill.fulfilled.match(resultAction)) {
-        setBill(bill.filter((bill) => bill.billNo !== formData.billNo));
-      }
+      await dispatch(deleteBill(billNo));
       setLoading(false);
       router.push("/bills");
     } catch (error) {
@@ -167,12 +169,15 @@ const BillDetails = ({ params }) => {
   const billClose = async () => {
     try {
       setLoading(true);
-      const resultAction = await dispatch(closeBill(billNo));
-      if (closeBill.fulfilled.match(resultAction)) {
-        setBill(bill.filter((bill) => bill.billNo !== formData.billNo));
+      if (bill.remainingAmount > 0) {
+        alert("Bill cannot be closed due to remaining amount");
+        setLoading(false);
+      } else {
+        await dispatch(closeBill(billNo));
+        setLoading(false);
+        router.push("/bills");
       }
       setLoading(false);
-      router.push("/bills");
     } catch (error) {
       console.error("Failed to delete invoice:", error);
       setLoading(false);
@@ -195,7 +200,7 @@ const BillDetails = ({ params }) => {
 
       {/* --- Add New Invoice Button with Popover --- */}
       <header className="flex justify-center p-5">
-        {bill.status === "active" ? (
+        {bill.status === "active" && bill.remainingAmount > 0 ? (
           <Popover open={showAddPopover} onOpenChange={setShowAddPopover}>
             <PopoverTrigger asChild>
               <Button
@@ -289,10 +294,22 @@ const BillDetails = ({ params }) => {
         ) : (
           <></>
         )}
+        {bill.invoices.length > 0 ? (
+          <>
+            <Button
+              onClick={resetForm}
+              className="hover:cursor-pointer ml-2 bg-[var(--ring)] text-white text-xl"
+            >
+              Print Bill
+            </Button>
+          </>
+        ) : (
+          <></>
+        )}
       </header>
 
       {/* --- Invoice Table --- */}
-      <Table className="w-[50vh] md:w-[70vh] lg:w-[110vh] text-xl ml-2 md:ml-5">
+      <Table className="w-[50vh] md:w-[70vh] lg:w-[110vh] text-lg md:text-xl ml-2 md:ml-5">
         <TableCaption>List of invoices for this bill</TableCaption>
         <TableHeader>
           <TableRow className="flex justify-between">
@@ -447,6 +464,7 @@ const BillDetails = ({ params }) => {
       {invoices.length > 0 ? (
         <Button
           onClick={billClose}
+          disabled={bill.remainingAmount > 0}
           className="hover:cursor-pointer bg-[var(--ring)] pl-5 pr-5 w-full sm:w-[70%] ml-1 lg:w-[60%] mr-2 mt-5 text-white text-xl"
         >
           Close Bill

@@ -6,7 +6,7 @@ const CreateBill = async (req, res) => {
     const { customerName, customerAddress, customerPhone, totalAmount } =
       req.body;
 
-    if (!customerName || !customerAddress || customerPhone || totalAmount) {
+    if (!customerName || !customerAddress || !customerPhone || !totalAmount) {
       return res.status(400).json({
         success: false,
         message: "All required fields must be provided.",
@@ -219,7 +219,7 @@ const UpdateBill = async (req, res) => {
 
 const CloseBill = async (req, res) => {
   try {
-    const { billNo } = req.body;
+    const { billNo } = req.params;
 
     const bill = await Bill.findOne({ billNo });
 
@@ -267,7 +267,7 @@ const CloseBill = async (req, res) => {
 
 const DeleteBill = async (req, res) => {
   try {
-    const { billNo } = req.body;
+    const { billNo } = req.params;
 
     const bill = await Bill.findOne({ billNo });
 
@@ -278,7 +278,7 @@ const DeleteBill = async (req, res) => {
       });
     }
 
-    if (bill.invoices && bill.invoices.length > 0) {
+    if (bill.invoices.length > 0) {
       return res.status(400).json({
         success: false,
         message: "Bill having Invoices cannot be deleted.",

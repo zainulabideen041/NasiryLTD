@@ -31,6 +31,7 @@ const billSchema = new mongoose.Schema({
   },
   receivedAmount: {
     type: Number,
+    default: 0,
   },
   status: {
     type: String,
