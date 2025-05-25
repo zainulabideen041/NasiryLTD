@@ -14,9 +14,9 @@ const initialState = {
 // Create a new bill
 export const createBill = createAsyncThunk(
   "bills/createBill",
-  async (billData, { rejectWithValue }) => {
+  async (billData, userId, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${baseURL}/create`, billData);
+      const res = await axios.post(`${baseURL}/create/${userId}`, billData);
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -40,9 +40,9 @@ export const getBillByNo = createAsyncThunk(
 // Get all bills
 export const getAllBills = createAsyncThunk(
   "bills/getAllBills",
-  async (_, { rejectWithValue }) => {
+  async (_, userId, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${baseURL}/display-all`);
+      const res = await axios.get(`${baseURL}/display-all/${userId}`);
       return res.data.bills;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

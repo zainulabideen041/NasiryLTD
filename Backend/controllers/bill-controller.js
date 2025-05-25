@@ -1,8 +1,10 @@
 const Bill = require("../models/Bill");
 const Invoice = require("../models/Invoice");
+const Admin = require("../models/Admin");
 
 const CreateBill = async (req, res) => {
   try {
+    const { userid } = req.params;
     const { customerName, customerAddress, customerPhone, totalAmount } =
       req.body;
 
@@ -10,6 +12,15 @@ const CreateBill = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "All required fields must be provided.",
+      });
+    }
+
+    const user = await Admin.findOne({ userid });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found.",
       });
     }
 
@@ -24,6 +35,7 @@ const CreateBill = async (req, res) => {
       customerPhone,
       totalAmount,
       remainingAmount: totalAmount,
+      userId: userid,
     });
 
     await bill.save();
@@ -96,7 +108,8 @@ const DisplayBill = async (req, res) => {
 
 const DisplayBills = async (req, res) => {
   try {
-    const bills = await Bill.find();
+    const { userid } = req.params;
+    const bills = await Bill.find({ userId: userid });
 
     if (!bills || bills.length === 0) {
       return res.json("No Bills Found!");

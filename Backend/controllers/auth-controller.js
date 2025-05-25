@@ -3,6 +3,35 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 // const { connectToDatabase } = require("../utils/db");
 
+// REGISTER USER CONTROLLER
+const register = async (req, res) => {
+  const { name, email, password } = req.body;
+  try {
+    const checkUser = await Admin.findOne({ email });
+    if (checkUser)
+      return res.json({
+        success: false,
+        message: "User already registered with this email address",
+      });
+
+    const hashPass = await bcrypt.hash(password, 12);
+
+    const newUser = new Admin({ name, email, password: hashPass });
+    await newUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Registration successful",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred",
+    });
+  }
+};
+
 // LOGIN USER CONTROLLER
 const login = async (req, res) => {
   // await connectToDatabase();
@@ -104,4 +133,5 @@ module.exports = {
   login,
   logout,
   authMiddleware,
+  register,
 };

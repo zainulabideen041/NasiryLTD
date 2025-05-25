@@ -2,7 +2,7 @@
 
 import ActiveBills from "./active";
 import ClosedBills from "./closed";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Loading from "@/components/Loading";
 import { useEffect, useState } from "react";
 import { getAllBills, createBill } from "@/redux/bill-slice";
@@ -10,6 +10,8 @@ import CreateBill from "./createBill";
 
 const Page = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const userId = user?.id;
   const [bills, setBills] = useState([]);
   const [showAddPopover, setShowAddPopover] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,7 +25,7 @@ const Page = () => {
   useEffect(() => {
     const fetchBills = async () => {
       setLoading(true);
-      const result = await dispatch(getAllBills());
+      const result = await dispatch(getAllBills(userId));
       if (result.payload && Array.isArray(result.payload)) {
         setBills(result.payload);
         setLoading(false);
@@ -70,7 +72,7 @@ const Page = () => {
     }
 
     try {
-      const res = await dispatch(createBill(formData));
+      const res = await dispatch(createBill(formData, userId));
       if (createBill.fulfilled.match(res)) {
         setBills((prev) => [...prev, res.payload]);
       }

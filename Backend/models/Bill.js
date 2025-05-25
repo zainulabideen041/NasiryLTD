@@ -43,6 +43,10 @@ const billSchema = new mongoose.Schema({
       type: String,
     },
   ],
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Admin",
+  },
 });
 
 module.exports = mongoose.model("Bill", billSchema);
