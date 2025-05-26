@@ -14,7 +14,7 @@ const initialState = {
 // Create a new bill
 export const createBill = createAsyncThunk(
   "bills/createBill",
-  async (billData, userId, { rejectWithValue }) => {
+  async ({ billData, userId }, { rejectWithValue }) => {
     try {
       const res = await axios.post(`${baseURL}/create/${userId}`, billData);
       return res.data.bill;
@@ -40,7 +40,7 @@ export const getBillByNo = createAsyncThunk(
 // Get all bills
 export const getAllBills = createAsyncThunk(
   "bills/getAllBills",
-  async (_, userId, { rejectWithValue }) => {
+  async ({ userId }, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${baseURL}/display-all/${userId}`);
       return res.data.bills;

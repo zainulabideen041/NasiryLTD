@@ -25,7 +25,7 @@ const Page = () => {
   useEffect(() => {
     const fetchBills = async () => {
       setLoading(true);
-      const result = await dispatch(getAllBills(userId));
+      const result = await dispatch(getAllBills({ userId }));
       if (result.payload && Array.isArray(result.payload)) {
         setBills(result.payload);
         setLoading(false);
@@ -72,7 +72,7 @@ const Page = () => {
     }
 
     try {
-      const res = await dispatch(createBill(formData, userId));
+      const res = await dispatch(createBill({ billData: formData, userId }));
       if (createBill.fulfilled.match(res)) {
         setBills((prev) => [...prev, res.payload]);
       }

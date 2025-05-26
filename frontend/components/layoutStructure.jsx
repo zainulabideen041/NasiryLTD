@@ -2,6 +2,7 @@
 
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import Footer from "./footer";
 import { usePathname } from "next/navigation";
 
 const LayoutStructure = ({ children }) => {
@@ -13,12 +14,14 @@ const LayoutStructure = ({ children }) => {
         <Navbar />
       </nav>
       <div
-        className={`flex flex-row ${pathname === "/" ? "justify-center" : ""}`}
+        className={`flex z-1 flex-row ${
+          pathname === "/" ? "justify-center" : ""
+        }`}
       >
         {pathname === "/" ? (
           <></>
         ) : (
-          <div className="w-[15%]">
+          <div className="w-[15%] min-h-[75vh]">
             <div className="w-full sticky top-60 lg:top-50 bg-[var(--background)]">
               <Sidebar />
             </div>
@@ -26,6 +29,7 @@ const LayoutStructure = ({ children }) => {
         )}
         <div className="overflow-hidden w-full">{children}</div>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { ShieldCheck, ShieldX, Newspaper, Users } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllBills } from "@/redux/bill-slice";
 import Loading from "@/components/Loading";
 import gsap from "gsap";
 
 const billcards = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const userId = user?.id;
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [hoveredBox, setHoveredBox] = useState(null);
+
   const activeCountRef = useRef(null);
   const totalCountRef = useRef(null);
   const closedCountRef = useRef(null);
@@ -25,7 +28,7 @@ const billcards = () => {
     const fetchBills = async () => {
       setIsLoading(true);
       try {
-        const result = await dispatch(getAllBills());
+        const result = await dispatch(getAllBills({ userId }));
 
         if (result.payload && Array.isArray(result.payload)) {
           const bills = result.payload;
