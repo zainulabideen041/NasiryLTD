@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-// const baseURL = "https://ecomtryonbackend.vercel.app/api/auth";
+
 const baseURL = "https://nasiry-backend.vercel.app/auth";
 
 const initialState = {

@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const baseURL = "http://localhost:7000/bill";
-// const baseURL = "https://nasiry-backend.vercel.app/bill";
+// const baseURL = "http://localhost:7000/bill";
+const baseURL = "https://nasiry-backend.vercel.app/bill";
 
 const initialState = {
   bills: [],
