@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const billSchema = new mongoose.Schema({
   billNo: {
-    type: String,
+    type: Number,
     required: true,
     unique: true,
   },
@@ -16,31 +16,41 @@ const billSchema = new mongoose.Schema({
   customerPhone: {
     type: String,
   },
+  customerArea: {
+    type: String,
+  },
   createdDate: {
     type: Date,
     default: Date.now,
-  },
-  finalDate: {
-    type: Date,
-  },
-  totalAmount: {
-    type: Number,
-  },
-  remainingAmount: {
-    type: Number,
-  },
-  receivedAmount: {
-    type: Number,
-    default: 0,
   },
   status: {
     type: String,
     default: "active",
     enum: ["active", "closed"],
   },
-  invoices: [
+  week: [
     {
-      type: String,
+      weekNo: {
+        type: Number,
+        default: 1,
+      },
+      invoices: [
+        {
+          invoiceNo: String,
+          invoiceAmount: Number,
+          invoiceDate: Date,
+        },
+      ],
+      totalAmount: {
+        type: Number,
+      },
+      remainingAmount: {
+        type: Number,
+      },
+      receivedAmount: {
+        type: Number,
+        default: 0,
+      },
     },
   ],
   userId: {

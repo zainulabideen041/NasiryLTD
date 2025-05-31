@@ -18,7 +18,7 @@ const Page = () => {
     customerName: "",
     customerAddress: "",
     customerPhone: "",
-    totalAmount: "",
+    customerArea: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -50,7 +50,7 @@ const Page = () => {
       customerName: "",
       customerAddress: "",
       customerPhone: "",
-      totalAmount: "",
+      customerArea: "",
     });
 
   const handleChange = (field, value) => {
@@ -63,9 +63,9 @@ const Page = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { customerName, customerAddress, customerPhone, totalAmount } =
+    const { customerName, customerAddress, customerPhone, customerArea } =
       formData;
-    if (!customerName || !customerAddress || !customerPhone || !totalAmount) {
+    if (!customerName || !customerAddress || !customerPhone || !customerArea) {
       alert("Please fill all the fields.");
       setLoading(false);
       return;
@@ -81,7 +81,7 @@ const Page = () => {
       setShowAddPopover(false);
     } catch (error) {
       setLoading(false);
-      console.error("An Error Occurred:", error);
+      console.error("An Error Occurred:", error.message);
     }
   };
 

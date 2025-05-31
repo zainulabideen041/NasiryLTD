@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// const baseURL = "http://localhost:7000/bill";
-const baseURL = "https://nasiry-backend.vercel.app/bill";
+const baseURL = "http://localhost:7000/bill";
+// const baseURL = "https://nasiry-backend.vercel.app/bill";
 
 const initialState = {
   bills: [],
@@ -53,9 +53,9 @@ export const getAllBills = createAsyncThunk(
 // Update bill
 export const updateBill = createAsyncThunk(
   "bills/updateBill",
-  async ({ billNo, updatedData }, { rejectWithValue }) => {
+  async ({ billNo, billForm }, { rejectWithValue }) => {
     try {
-      const res = await axios.put(`${baseURL}/update/${billNo}`, updatedData);
+      const res = await axios.put(`${baseURL}/update/${billNo}`, billForm);
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -82,6 +82,18 @@ export const closeBill = createAsyncThunk(
   async (billNo, { rejectWithValue }) => {
     try {
       const res = await axios.post(`${baseURL}/close/${billNo}`);
+      return res.data.bill;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+export const addWeek = createAsyncThunk(
+  "bills/addWeek",
+  async (billNo, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(`${baseURL}/add-week`, { billNo });
       return res.data.bill;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -184,6 +196,26 @@ const billSlice = createSlice({
         );
       })
       .addCase(closeBill.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Add Week
+      .addCase(addWeek.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(addWeek.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const updatedBill = action.payload;
+        state.bills = state.bills.map((bill) =>
+          bill.billNo === updatedBill.billNo ? updatedBill : bill
+        );
+
+        if (state.bill?.billNo === updatedBill.billNo) {
+          state.bill = updatedBill;
+        }
+      })
+      .addCase(addWeek.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

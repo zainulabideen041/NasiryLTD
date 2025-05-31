@@ -73,16 +73,16 @@ const createBill = ({
                 </div>
 
                 <div className="flex items-center gap-2 p-5">
-                  <Label htmlFor="totalAmount">Total Amount</Label>
+                  <Label htmlFor="customerArea">Area</Label>
                   <Input
-                    id="totalAmount"
-                    type="number"
-                    value={formData.totalAmount}
+                    id="customerArea"
+                    type="text"
+                    value={formData.customerArea}
                     onChange={(e) =>
-                      handleChange("totalAmount", e.target.value)
+                      handleChange("customerArea", e.target.value)
                     }
                     className="col-span-2 h-8"
-                    placeholder="Total Amount to Receive"
+                    placeholder="Customer Area"
                   />
                 </div>
               </div>

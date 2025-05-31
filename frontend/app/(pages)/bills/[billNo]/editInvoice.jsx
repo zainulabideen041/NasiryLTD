@@ -24,69 +24,86 @@ import {
 const EditInvoice = ({
   editInvoice,
   setEditInvoice,
+  week,
+  invoiceLength,
   formData,
   handleChange,
   handleUpdate,
   invoiceDelete,
-  invoices,
   handleRowClick,
-  bill,
+  resetForm,
 }) => {
   return (
     <div>
-      <Table className="w-[50vh] md:w-[70vh] lg:w-[110vh] text-lg md:text-xl ml-2 md:ml-5">
-        <TableCaption>List of invoices for this bill</TableCaption>
-        <TableHeader>
-          <TableRow className="flex justify-between">
-            <TableHead className="w-[100px] font-bold">Invoice</TableHead>
-            <TableHead className="font-bold md:text-center">Date</TableHead>
-            <TableHead className="md:text-right font-bold">Amount</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invoices.length > 0 ? (
-            invoices.map((invoice) => (
-              <TableRow
-                key={invoice.invoiceNo}
-                onClick={() => handleRowClick(invoice)}
-                className="flex justify-between"
-              >
-                <TableCell className="font-extralight">
-                  {invoice.invoiceNo}
-                </TableCell>
-                <TableCell className="md:text-center font-extralight">
-                  {invoice.date.split("T")[0]}
-                </TableCell>
-                <TableCell className="md:text-right font-extralight">
-                  £{invoice.amount}
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <></>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow className="flex justify-between">
-            <TableCell colSpan={2}>Amount Received by Invoices</TableCell>
-            <TableCell className="text-right font-semibold">
-              £ {bill.receivedAmount}
-            </TableCell>
-          </TableRow>
-          <TableRow className="flex justify-between">
-            <TableCell colSpan={2}>Total Amount to Receive</TableCell>
-            <TableCell className="text-right font-semibold">
-              £ {bill.totalAmount}
-            </TableCell>
-          </TableRow>
-          <TableRow className="flex justify-between">
-            <TableCell colSpan={2}>Remaining Amount</TableCell>
-            <TableCell className="text-right font-semibold text-red-700">
-              £ {bill.remainingAmount}
-            </TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+      {invoiceLength ? (
+        <>
+          <Button
+            onClick={resetForm}
+            className="hover:cursor-pointer m-2 bg-[var(--ring)] text-white text-xl"
+          >
+            Print Bill
+          </Button>
+        </>
+      ) : (
+        <></>
+      )}
+      <div>
+        <Table className="w-[50vh] md:w-[70vh] lg:w-[110vh] text-lg md:text-xl ml-2 md:ml-5">
+          <TableHeader>
+            <TableRow className="flex justify-between">
+              <TableHead className="w-[100px] font-bold">Invoice</TableHead>
+              <TableHead className="font-bold md:text-center">Date</TableHead>
+              <TableHead className="md:text-right font-bold">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {week.invoices.length > 0 ? (
+              week.invoices.map((invoice) => (
+                <TableRow
+                  key={invoice.invoiceNo}
+                  onClick={() => handleRowClick(invoice, week.weekNo)}
+                  className="flex justify-between"
+                >
+                  <TableCell className="font-extralight">
+                    {invoice.invoiceNo}
+                  </TableCell>
+                  <TableCell className="md:text-center font-extralight">
+                    {invoice.invoiceDate?.split("T")[0] ?? "N/A"}
+                  </TableCell>
+                  <TableCell className="md:text-right font-extralight">
+                    £{invoice.invoiceAmount}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <p className="flex justify-center p-8 text-2xl">
+                No Invoices Added yet
+              </p>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow className="flex justify-between">
+              <TableCell colSpan={2}>Amount Received by Invoices</TableCell>
+              <TableCell className="text-right font-semibold">
+                £ {week.receivedAmount}
+              </TableCell>
+            </TableRow>
+            <TableRow className="flex justify-between">
+              <TableCell colSpan={2}>Remaining Amount</TableCell>
+              <TableCell className="text-right font-semibold text-red-700">
+                £ {week.remainingAmount}
+              </TableCell>
+            </TableRow>
+            <TableRow className="flex justify-between">
+              <TableCell colSpan={2}>Total Amount to Receive</TableCell>
+              <TableCell className="text-right font-semibold">
+                £ {week.totalAmount}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </div>
+
       {editInvoice && (
         <Popover open onOpenChange={(open) => !open && setEditInvoice(null)}>
           <PopoverTrigger asChild>
@@ -160,7 +177,7 @@ const EditInvoice = ({
                       id="amount"
                       type="number"
                       value={formData.amount}
-                      onChange={(e) => handleChange("amount", +e.target.value)}
+                      onChange={(e) => handleChange("amount", e.target.value)}
                       className="col-span-2 h-8 "
                     />
                   </div>

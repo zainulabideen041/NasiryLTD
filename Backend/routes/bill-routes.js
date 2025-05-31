@@ -5,6 +5,7 @@ const {
   CreateBill,
   UpdateBill,
   DisplayBill,
+  AddWeek,
   DisplayBills,
   DeleteBill,
   CloseBill,
@@ -12,6 +13,7 @@ const {
 
 router.post("/create/:userid", CreateBill);
 router.put("/update/:billNo", UpdateBill);
+router.post("/add-week", AddWeek);
 router.get("/display/:billNo", DisplayBill);
 router.get("/display-all/:userid", DisplayBills);
 router.post("/close/:billNo", CloseBill);

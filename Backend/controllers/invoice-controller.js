@@ -3,10 +3,13 @@ const Bill = require("../models/Bill");
 
 const AddInvoice = async (req, res) => {
   try {
-    const { invoiceNo, date, amount, billNo } = req.body;
+    const { invoiceNo, date, amount, billNo, weekNo } = req.body;
 
-    if (!invoiceNo || !date || !amount || !billNo) {
-      return res.json("All Fields are Required!");
+    if (!invoiceNo || !date || !amount || !billNo || !weekNo) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required.",
+      });
     }
 
     const Invoice_amount = Number(amount);
@@ -14,13 +17,19 @@ const AddInvoice = async (req, res) => {
     const bill = await Bill.findOne({ billNo });
 
     if (!bill) {
-      return res.json("Bill doesn't exist.");
+      return res.status(404).json({
+        success: false,
+        message: "Bill doesn't exist.",
+      });
     }
 
     const existingInvoice = await Invoice.findOne({ invoiceNo });
 
     if (existingInvoice) {
-      return res.json("Invoice with this Invoice No. already exists. ");
+      return res.status(400).json({
+        success: false,
+        message: "Invoice with this Invoice No. already exists.",
+      });
     }
 
     const invoice = new Invoice({
@@ -32,22 +41,45 @@ const AddInvoice = async (req, res) => {
 
     await invoice.save();
 
-    bill.remainingAmount -= Invoice_amount;
-    bill.receivedAmount += Invoice_amount;
-    bill.invoices.push(invoice.invoiceNo);
+    const targetWeek = bill.week.find((w) => w.weekNo === Number(weekNo));
+
+    if (!targetWeek) {
+      return res.status(400).json({
+        success: false,
+        message: `Week ${weekNo} not found in this bill.`,
+      });
+    }
+
+    if (targetWeek.invoices.length === 5) {
+      return res.status(400).json({
+        success: false,
+        message: `Week ${weekNo} already has 5 invoices. Cannot add more.`,
+      });
+    }
+
+    // Add the invoice reference
+    targetWeek.invoices.push({
+      invoiceNo,
+      invoiceDate: date,
+      invoiceAmount: Invoice_amount,
+    });
+
+    // Ensure totalAmount is initialized
+    targetWeek.totalAmount = (targetWeek.totalAmount || 0) + Invoice_amount;
+
     await bill.save();
 
     res.json({
       success: true,
-      message: "Invoice Added Successfully",
-      invoice: invoice,
+      message: "Invoice added successfully.",
+      invoice,
     });
   } catch (error) {
     console.error("Error Adding Invoice:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to Add Invoice.",
-      error: error,
+      message: "Failed to add invoice.",
+      error: error.message,
     });
   }
 };
@@ -72,7 +104,13 @@ const UpdateInvoice = async (req, res) => {
       });
     }
 
-    if (date !== undefined) invoice.date = date;
+    const oldAmount = invoice.amount;
+
+    if (date !== undefined) {
+      invoice.date = date;
+    }
+
+    let newAmount = oldAmount;
 
     if (amount !== undefined) {
       const numericAmount = Number(amount);
@@ -82,6 +120,7 @@ const UpdateInvoice = async (req, res) => {
           message: "Amount must be a valid number.",
         });
       }
+      newAmount = numericAmount;
       invoice.amount = numericAmount;
     }
 
@@ -96,15 +135,17 @@ const UpdateInvoice = async (req, res) => {
       });
     }
 
-    const invoices = await Invoice.find({ billNo: bill.billNo });
+    const week = bill.week.find((w) => w.invoices.includes(invoiceNo));
 
-    const totalReceived = invoices.reduce(
-      (sum, inv) => sum + Number(inv.amount || 0),
-      0
-    );
+    if (!week) {
+      return res.status(400).json({
+        success: false,
+        message: "Invoice does not belong to any week in the bill.",
+      });
+    }
 
-    bill.receivedAmount = totalReceived;
-    bill.remainingAmount = bill.totalAmount - totalReceived;
+    // Update totalAmount for the week
+    week.totalAmount = (week.totalAmount || 0) - oldAmount + newAmount;
 
     await bill.save();
 
@@ -136,23 +177,55 @@ const DeleteInvoice = async (req, res) => {
       });
     }
 
-    // Remove invoice reference from the Bill as well
-    await Bill.updateOne(
-      { billNo: invoice.billNo },
-      { $pull: { invoices: invoice.invoiceNo } }
+    const bill = await Bill.findOne({ billNo: invoice.billNo });
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        message: "Associated bill not found.",
+      });
+    }
+
+    // Find the week that contains this invoice
+    const targetWeek = bill.week.find((w) =>
+      w.invoices.some((inv) => inv.invoiceNo === invoiceNo)
     );
 
+    if (!targetWeek) {
+      return res.status(400).json({
+        success: false,
+        message: "Invoice not found in any week of the bill.",
+      });
+    }
+
+    // Remove the invoice object from the week
+    targetWeek.invoices = targetWeek.invoices.filter(
+      (inv) => inv.invoiceNo !== invoiceNo
+    );
+
+    // Subtract the invoice amount from totalAmount
+    targetWeek.totalAmount =
+      (targetWeek.totalAmount || 0) - Number(invoice.amount || 0);
+
+    // Recalculate remainingAmount
+    targetWeek.remainingAmount =
+      (targetWeek.totalAmount || 0) - (targetWeek.receivedAmount || 0);
+
+    // Save updated bill
+    await bill.save();
+
+    // Delete the invoice from the Invoice collection
     await invoice.deleteOne();
 
     res.json({
       success: true,
-      message: "Invoice Deleted Successfully",
+      message: "Invoice deleted successfully.",
     });
   } catch (error) {
     console.error("Error Deleting Invoice:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to Delete Invoice.",
+      message: "Failed to delete invoice.",
       error: error.message,
     });
   }
