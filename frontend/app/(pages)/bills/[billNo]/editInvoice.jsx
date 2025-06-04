@@ -13,13 +13,13 @@ import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import PrintReceipt from "./PrintReceipt";
 
 const EditInvoice = ({
   editInvoice,
@@ -32,18 +32,18 @@ const EditInvoice = ({
   invoiceDelete,
   handleRowClick,
   resetForm,
+  bill,
 }) => {
   return (
     <div>
       {invoiceLength ? (
-        <>
-          <Button
-            onClick={resetForm}
-            className="hover:cursor-pointer m-2 bg-[var(--ring)] text-white text-xl"
-          >
-            Print Bill
-          </Button>
-        </>
+        <PrintReceipt
+          week={week}
+          customerName={bill.customerName}
+          onSuccess={resetForm}
+          buttonText="Print Bill"
+          className="hover:cursor-pointer m-2 bg-green-600 text-white text-xl"
+        />
       ) : (
         <></>
       )}
@@ -83,7 +83,7 @@ const EditInvoice = ({
           </TableBody>
           <TableFooter>
             <TableRow className="flex justify-between">
-              <TableCell colSpan={2}>Amount Received by Invoices</TableCell>
+              <TableCell colSpan={2}>Amount Received</TableCell>
               <TableCell className="text-right font-semibold">
                 £ {week.receivedAmount}
               </TableCell>
@@ -95,7 +95,7 @@ const EditInvoice = ({
               </TableCell>
             </TableRow>
             <TableRow className="flex justify-between">
-              <TableCell colSpan={2}>Total Amount to Receive</TableCell>
+              <TableCell colSpan={2}>Total Amount</TableCell>
               <TableCell className="text-right font-semibold">
                 £ {week.totalAmount}
               </TableCell>

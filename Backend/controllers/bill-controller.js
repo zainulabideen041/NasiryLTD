@@ -155,7 +155,7 @@ const AddWeek = async (req, res) => {
     // Add new week with accumulated remaining amount
     bill.week.push({
       weekNo: nextWeekNo,
-      totalAmount: 0,
+      totalAmount: totalRemaining,
       receivedAmount: 0,
       remainingAmount: totalRemaining,
       invoices: [],
