@@ -50,10 +50,23 @@ const AddInvoice = async (req, res) => {
       });
     }
 
-    if (targetWeek.invoices.length === 5) {
+    // Get unique dates from existing invoices in this week
+    const existingDates = new Set();
+    targetWeek.invoices.forEach((invoice) => {
+      // Convert date to string for comparison (assuming date format is consistent)
+      const dateStr = new Date(invoice.invoiceDate).toDateString();
+      existingDates.add(dateStr);
+    });
+
+    // Check if the new invoice date already exists
+    const newDateStr = new Date(date).toDateString();
+    const isNewDate = !existingDates.has(newDateStr);
+
+    // If it's a new date and we already have 5 different dates, reject
+    if (isNewDate && existingDates.size >= 5) {
       return res.status(400).json({
         success: false,
-        message: `Week ${weekNo} already has 5 invoices. Cannot add more.`,
+        message: `Week ${weekNo} already has invoices from 5 different dates. Cannot add invoice with a new date.`,
       });
     }
 

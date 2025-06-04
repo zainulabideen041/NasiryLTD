@@ -59,8 +59,26 @@ const BillDetails = ({ params }) => {
     return getWeekInvoiceCount(week) > 0;
   };
 
+  // NEW: Check if week has 5 different dates
+  const getWeekUniqueDatesCount = (week) => {
+    if (!week.invoices || week.invoices.length === 0) return 0;
+
+    const uniqueDates = new Set();
+    week.invoices.forEach((invoice) => {
+      const dateStr = new Date(invoice.invoiceDate).toDateString();
+      uniqueDates.add(dateStr);
+    });
+
+    return uniqueDates.size;
+  };
+
+  const hasWeekFiveDifferentDates = (week) => {
+    return getWeekUniqueDatesCount(week) >= 5;
+  };
+
+  // Updated: Can add invoices if less than 5 different dates (not just 5 invoices)
   const canWeekAddInvoices = (week) => {
-    return getWeekInvoiceCount(week) < 5;
+    return !hasWeekFiveDifferentDates(week);
   };
 
   // Check if we can add a new week (last week should have exactly 5 invoices)
@@ -68,6 +86,11 @@ const BillDetails = ({ params }) => {
     if (weeks.length === 0) return false;
     const lastWeek = weeks[weeks.length - 1];
     return hasWeekFiveInvoices(lastWeek);
+  };
+
+  // NEW: Check if bill has any invoices in any week
+  const billHasAnyInvoices = () => {
+    return weeks.some((week) => hasWeekAnyInvoices(week));
   };
 
   const [editInvoice, setEditInvoice] = useState(null);
@@ -156,7 +179,6 @@ const BillDetails = ({ params }) => {
       if (!addInvoice.fulfilled.match(resultAction)) {
         throw new Error("Failed to add invoice.");
       }
-
       await refreshBillData();
       resetForm();
       setShowAddPopover(false);
@@ -175,7 +197,6 @@ const BillDetails = ({ params }) => {
       if (!updateInvoice.fulfilled.match(resultAction)) {
         throw new Error("Failed to update invoice.");
       }
-
       await refreshBillData();
       setEditInvoice(null);
     } catch (error) {
@@ -193,7 +214,6 @@ const BillDetails = ({ params }) => {
       if (!deleteInvoice.fulfilled.match(resultAction)) {
         throw new Error("Failed to delete invoice.");
       }
-
       await refreshBillData();
       setEditInvoice(null);
     } catch (error) {
@@ -212,26 +232,10 @@ const BillDetails = ({ params }) => {
       router.push("/bills");
     } catch (error) {
       console.error("Failed to delete bill:", error.message);
+      alert("Failed to delete bill:", error.message);
       setLoading(false);
     }
   };
-
-  // const billClose = async () => {
-  //   try {
-  //     setLoading(true);
-  //     if (bill.remainingAmount > 0) {
-  //       alert("Bill cannot be closed due to remaining amount");
-  //       setLoading(false);
-  //       return;
-  //     }
-  //     await dispatch(closeBill(billNo));
-  //     setLoading(false);
-  //     router.push("/bills");
-  //   } catch (error) {
-  //     console.error("Failed to close bill:", error);
-  //     setLoading(false);
-  //   }
-  // };
 
   const billUpdate = async () => {
     setLoading(true);
@@ -240,7 +244,6 @@ const BillDetails = ({ params }) => {
       if (!updateBill.fulfilled.match(resultAction)) {
         throw new Error("Failed to update Bill.");
       }
-
       await refreshBillData();
       setShowEditPopover(false);
     } catch (error) {
@@ -258,7 +261,6 @@ const BillDetails = ({ params }) => {
       if (!addWeek.fulfilled.match(resultAction)) {
         throw new Error("Failed to add new week.");
       }
-
       await refreshBillData();
     } catch (error) {
       console.error("Failed to add new week:", error.message);
@@ -289,13 +291,16 @@ const BillDetails = ({ params }) => {
                 Add New Week
               </Button>
             )}
-            <Button
-              onClick={billDelete}
-              variant="destructive"
-              className="hover:cursor-pointer text-xl"
-            >
-              Delete Bill
-            </Button>
+            {/* UPDATED: Only show delete button if bill has NO invoices */}
+            {!billHasAnyInvoices() && (
+              <Button
+                onClick={billDelete}
+                variant="destructive"
+                className="hover:cursor-pointer text-xl"
+              >
+                Delete Bill
+              </Button>
+            )}
           </>
         )}
       </div>
@@ -313,16 +318,17 @@ const BillDetails = ({ params }) => {
               {bill.customerName} - Week {currentWeek?.weekNo || index + 1}
             </h1>
             <div className="text-sm text-gray-600 mb-4">
-              Invoices: {getWeekInvoiceCount(currentWeek)}/5
-              {hasWeekFiveInvoices(currentWeek) && (
+              Invoices: {getWeekInvoiceCount(currentWeek)}/5 (Unique dates:{" "}
+              {getWeekUniqueDatesCount(currentWeek)}/5)
+              {hasWeekFiveDifferentDates(currentWeek) && (
                 <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                  Week Complete
+                  5 Different Dates Complete
                 </span>
               )}
             </div>
           </div>
 
-          {/* Add Invoice Component - Only show if week can accept more invoices and bill is active */}
+          {/* UPDATED: Add Invoice Component - Only show if week doesn't have 5 different dates and bill is active */}
           {bill.status === "active" && canWeekAddInvoices(currentWeek) && (
             <AddInvoice
               weekNo={currentWeek.weekNo}
@@ -332,7 +338,7 @@ const BillDetails = ({ params }) => {
               resetForm={resetForm}
               showAddPopover={showAddPopover}
               setShowAddPopover={setShowAddPopover}
-              fiveInvoices={hasWeekFiveInvoices(currentWeek)}
+              fiveInvoices={hasWeekFiveDifferentDates(currentWeek)}
               invoiceLength={hasWeekAnyInvoices(currentWeek)}
               bill={bill}
             />
@@ -354,13 +360,13 @@ const BillDetails = ({ params }) => {
             week={currentWeek}
           />
 
-          {/* Edit Bill Component - Only show for the first week or when week has invoices */}
+          {/* UPDATED: Edit Bill Component - Show for last week if it has invoices (removed remaining amount condition) */}
           {index === weeks.length - 1 && hasWeekAnyInvoices(currentWeek) && (
             <EditBill
               week={currentWeek}
               billNo={billNo}
               billForm={billForm}
-              fiveInvoices={hasWeekFiveInvoices(currentWeek)}
+              fiveInvoices={hasWeekFiveDifferentDates(currentWeek)}
               showEditPopover={showEditPopover}
               setShowEditPopover={setShowEditPopover}
               handleChange={handleBillChange}
