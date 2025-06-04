@@ -51,11 +51,11 @@ const Sidebar = () => {
       icon: <Users size={30} />,
       label: "Customers",
     },
-    {
-      href: "/analytics",
-      icon: <ChartNoAxesCombined size={30} />,
-      label: "Analytics",
-    },
+    // {
+    //   href: "/analytics",
+    //   icon: <ChartNoAxesCombined size={30} />,
+    //   label: "Analytics",
+    // },
     { href: "/profile", icon: <UserRoundCog size={30} />, label: "Profile" },
     {
       href: "/",
