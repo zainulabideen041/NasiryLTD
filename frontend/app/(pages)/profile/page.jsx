@@ -13,9 +13,9 @@ const page = () => {
       {user ? (
         <main className="w-full">
           <h1 className="text-2xl lg:text-4xl lg:font-extrabold font-bold tracking-wide mt-5 ml-5">
-            PROFILE PAGE UNDER DEVELOPED
+            PROFILE
           </h1>
-          <Profile />
+          <Profile user={user} />
         </main>
       ) : (
         <div className="h-[80vh] flex items-center justify-center">

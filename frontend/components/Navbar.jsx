@@ -53,13 +53,13 @@ const Navbar = () => {
           <span className="mr-1">
             <Phone size={20} className="w-4 md:w-5" />
           </span>
-          +44 755 455 655
+          07 926 154 379
         </p>
         <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-sm sm:font-light lg:text-lg items-center pl-2 pr-2">
           <span className="mr-1">
             <Phone size={20} className="w-4 md:w-5" />
           </span>
-          +44 755 455 655
+          07 710 437 795
         </p>
         <p className="flex text-[var(--ring)] text-sm lg:font-semibold sm:text-sm sm:font-light lg:text-lg items-center pl-2 pr-2">
           <span className="mr-1">

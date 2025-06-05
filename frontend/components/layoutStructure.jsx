@@ -21,7 +21,7 @@ const LayoutStructure = ({ children }) => {
         {pathname === "/" ? (
           <></>
         ) : (
-          <div className="w-[15%] min-h-[75vh]">
+          <div className="w-[15%]">
             <div className="w-full sticky top-60 lg:top-50 bg-[var(--background)]">
               <Sidebar />
             </div>

@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { loginUser } from "@/redux/auth-slice";
 import { useDispatch } from "react-redux";
 import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
-import Link from "next/link";
 import Swal from "sweetalert2";
 
 const Login = () => {
@@ -82,13 +81,13 @@ const Login = () => {
 
   return (
     <div className="w-full min-h-[72vh] flex flex-col justify-center items-center px-4">
-      <h1 className="text-4xl lg:text-5xl text-center font-extrabold mb-8">
+      <h1 className="text-4xl lg:text-5xl text-center font-extrabold mb-5 md:mb-8">
         Login to your Account
       </h1>
 
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-xl border rounded-xl p-10 flex flex-col gap-4"
+        className="w-full max-w-xl border rounded-xl p-5 md:p-10 flex flex-col gap-4"
       >
         <div>
           <Label htmlFor="email" className="text-lg md:text-xl mb-2 font-bold">

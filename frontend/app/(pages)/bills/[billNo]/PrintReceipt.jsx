@@ -89,7 +89,7 @@ const PDFReceiptGenerator = ({
       );
 
       yPosition += 15;
-      pdf.text("+44 755 455 655 | UK, London", pageWidth / 2, yPosition, {
+      pdf.text("07 926 154 379 | UK, London", pageWidth / 2, yPosition, {
         align: "center",
       });
 
@@ -208,7 +208,7 @@ const PDFReceiptGenerator = ({
       });
       yPosition += 5;
       pdf.text(
-        "For any queries, please contact us at +44 755 455 655",
+        "For any queries, please contact us at 07 926 154 379",
         pageWidth / 2,
         yPosition,
         { align: "center" }
@@ -262,10 +262,10 @@ const PDFReceiptGenerator = ({
             </div>
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; padding: 15px; background: #f9fafb; border-radius: 8px;">
               <p style="display: flex; align-items: center; margin: 5px 15px; color: #059669; font-weight: 600;">
-                +44 755 455 655
+                07 926 154 379
               </p>
               <p style="display: flex; align-items: center; margin: 5px 15px; color: #059669; font-weight: 600;">
-                +44 755 455 655
+                07 710 437 795
               </p>
               <p style="display: flex; align-items: center; margin: 5px 15px; color: #059669; font-weight: 600;">
                 UK, London
@@ -349,7 +349,7 @@ const PDFReceiptGenerator = ({
           <!-- Footer -->
           <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e5e7eb;">
             <p style="font-size: 12px; color: #6b7280; margin: 5px 0;">Thank you for your business!</p>
-            <p style="font-size: 12px; color: #6b7280; margin: 5px 0;">For any queries, please contact us at +44 755 455 655</p>
+            <p style="font-size: 12px; color: #6b7280; margin: 5px 0;">For any queries, please contact us at 07 926 154 379</p>
           </div>
         </div>
       `;
