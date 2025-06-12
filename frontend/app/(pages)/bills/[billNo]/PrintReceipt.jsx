@@ -101,15 +101,15 @@ const PDFReceiptGenerator = ({
         align: "center",
       });
 
-      yPosition += 10;
-      pdf.setFontSize(10);
-      pdf.setFont(undefined, "normal");
-      pdf.text(
-        `Generated on ${new Date().toLocaleDateString()}`,
-        pageWidth / 2,
-        yPosition,
-        { align: "center" }
-      );
+      // yPosition += 10;
+      // pdf.setFontSize(10);
+      // pdf.setFont(undefined, "normal");
+      // pdf.text(
+      //   `Generated on ${new Date().toLocaleDateString()}`,
+      //   pageWidth / 2,
+      //   yPosition,
+      //   { align: "center" }
+      // );
 
       // Customer Details
       yPosition += 20;
@@ -275,7 +275,6 @@ const PDFReceiptGenerator = ({
           <!-- Receipt Header -->
           <div style="text-align: center; margin-bottom: 30px;">
             <h2 style="font-size: 28px; font-weight: bold; margin: 0; color: #1f2937;">INVOICE RECEIPT</h2>
-            <p style="font-size: 14px; color: #6b7280; margin: 10px 0;">Generated on ${new Date().toLocaleDateString()}</p>
           </div>
           <!-- Customer Information -->
           <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">

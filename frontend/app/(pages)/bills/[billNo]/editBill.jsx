@@ -15,7 +15,7 @@ const EditBill = ({
   handleChange,
   billUpdate,
   billNo,
-  fiveInvoices,
+  oneInvoice,
   resetForm,
 }) => {
   return (
@@ -111,8 +111,8 @@ const EditBill = ({
                   <Label htmlFor="receivedAmount">Amount Received</Label>
                   <Input
                     id="receivedAmount"
-                    disabled={!fiveInvoices}
                     type="number"
+                    disabled={!oneInvoice}
                     value={billForm.receivedAmount}
                     onChange={(e) =>
                       handleChange("receivedAmount", e.target.value)
@@ -122,12 +122,21 @@ const EditBill = ({
                 </div>
               </div>
 
-              <Button
-                onClick={billUpdate}
-                className="col-span-3 bg-[var(--ring)] text-white mt-2 hover:cursor-pointer"
-              >
-                Update Bill
-              </Button>
+              {billForm.receivedAmount > week.totalAmount ? (
+                <Button
+                  disabled
+                  className="col-span-3 bg-[var(--ring)] text-white mt-2 hover:cursor-pointer"
+                >
+                  Update Bill
+                </Button>
+              ) : (
+                <Button
+                  onClick={billUpdate}
+                  className="col-span-3 bg-[var(--ring)] text-white mt-2 hover:cursor-pointer"
+                >
+                  Update Bill
+                </Button>
+              )}
             </div>
           </div>
         </PopoverContent>

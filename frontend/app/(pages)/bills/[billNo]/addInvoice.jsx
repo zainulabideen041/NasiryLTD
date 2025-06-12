@@ -38,7 +38,7 @@ const AddInvoice = ({
             }}
             className="hover:cursor-pointer bg-[var(--ring)] text-white text-xl"
           >
-            Add New Invoice to Week {weekNo}
+            Add New Invoice
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[44vh] md:w-[90vh] xl:w-[100vh]">

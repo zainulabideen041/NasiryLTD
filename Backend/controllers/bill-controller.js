@@ -277,7 +277,7 @@ const UpdateBill = async (req, res) => {
     if (receivedAmount && weekNo) {
       const targetWeek = bill.week.find((w) => w.weekNo === Number(weekNo));
       if (targetWeek) {
-        targetWeek.receivedAmount = receivedAmount;
+        targetWeek.receivedAmount = targetWeek.receivedAmount + receivedAmount;
         targetWeek.remainingAmount =
           (targetWeek.totalAmount || 0) - receivedAmount;
       }

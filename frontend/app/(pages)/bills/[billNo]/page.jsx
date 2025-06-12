@@ -366,7 +366,7 @@ const BillDetails = ({ params }) => {
               week={currentWeek}
               billNo={billNo}
               billForm={billForm}
-              fiveInvoices={hasWeekFiveDifferentDates(currentWeek)}
+              oneInvoice={hasWeekAnyInvoices(currentWeek)}
               showEditPopover={showEditPopover}
               setShowEditPopover={setShowEditPopover}
               handleChange={handleBillChange}
