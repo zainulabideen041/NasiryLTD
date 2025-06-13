@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { use } from "react";
+import Swal from "sweetalert2";
 import { notFound, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
 import { useDispatch } from "react-redux";
@@ -10,7 +11,6 @@ import EditBill from "./editBill";
 import {
   getBillByNo,
   deleteBill,
-  closeBill,
   updateBill,
   addWeek,
 } from "@/redux/bill-slice";
@@ -170,21 +170,27 @@ const BillDetails = ({ params }) => {
 
   const handleAdd = async () => {
     if (!formData.invoiceNo || !formData.date || !formData.amount) {
-      alert("All fields are required.");
+      Swal.fire("Validation Error", "All fields are required.", "warning");
       return;
     }
     setLoading(true);
     try {
       const resultAction = await dispatch(addInvoice(formData));
       if (!addInvoice.fulfilled.match(resultAction)) {
-        throw new Error("Failed to add invoice.");
+        const errorMessage =
+          resultAction.payload?.message ||
+          resultAction.error?.message ||
+          "Failed to add invoice.";
+        throw new Error(errorMessage);
       }
+
       await refreshBillData();
       resetForm();
       setShowAddPopover(false);
+
+      Swal.fire("Success", "Invoice added successfully!", "success");
     } catch (error) {
-      console.error("Failed to add invoice:", error.message);
-      alert(error.message);
+      Swal.fire("Error", error.message, "error");
     } finally {
       setLoading(false);
     }
@@ -195,44 +201,60 @@ const BillDetails = ({ params }) => {
     try {
       const resultAction = await dispatch(updateInvoice(formData));
       if (!updateInvoice.fulfilled.match(resultAction)) {
-        throw new Error("Failed to update invoice.");
+        const errorMessage =
+          resultAction.payload?.message ||
+          resultAction.error?.message ||
+          "Failed to update invoice.";
+        throw new Error(errorMessage);
       }
       await refreshBillData();
       setEditInvoice(null);
+      Swal.fire("Success", "Invoice updated successfully!", "success");
     } catch (error) {
-      console.error("Failed to update invoice:", error.message);
-      alert("Something went wrong while updating invoice.");
+      Swal.fire(
+        "Error",
+        error.message || "Something went wrong while updating invoice.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const invoiceDelete = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const resultAction = await dispatch(deleteInvoice(formData.invoiceNo));
       if (!deleteInvoice.fulfilled.match(resultAction)) {
-        throw new Error("Failed to delete invoice.");
+        const errorMessage =
+          resultAction.payload?.message ||
+          resultAction.error?.message ||
+          "Failed to delete invoice.";
+        throw new Error(errorMessage);
       }
       await refreshBillData();
       setEditInvoice(null);
+      Swal.fire("Success", "Invoice deleted successfully!", "success");
     } catch (error) {
-      console.error("Failed to delete invoice:", error.message);
-      alert("Something went wrong while deleting invoice.");
+      Swal.fire(
+        "Error",
+        error.message || "Something went wrong while deleting invoice.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const billDelete = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       await dispatch(deleteBill(billNo));
-      setLoading(false);
+      Swal.fire("Success", "Bill deleted successfully!", "success");
       router.push("/bills");
     } catch (error) {
-      console.error("Failed to delete bill:", error.message);
-      alert("Failed to delete bill:", error.message);
+      Swal.fire("Error", error.message || "Failed to delete bill.", "error");
+    } finally {
       setLoading(false);
     }
   };
@@ -242,13 +264,21 @@ const BillDetails = ({ params }) => {
     try {
       const resultAction = await dispatch(updateBill({ billNo, billForm }));
       if (!updateBill.fulfilled.match(resultAction)) {
-        throw new Error("Failed to update Bill.");
+        const errorMessage =
+          resultAction.payload?.message ||
+          resultAction.error?.message ||
+          "Failed to update bill.";
+        throw new Error(errorMessage);
       }
       await refreshBillData();
       setShowEditPopover(false);
+      Swal.fire("Success", "Bill updated successfully!", "success");
     } catch (error) {
-      console.error("Failed to update Bill:", error.message);
-      alert("Something went wrong while updating Bill.");
+      Swal.fire(
+        "Error",
+        error.message || "Something went wrong while updating Bill.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -259,12 +289,20 @@ const BillDetails = ({ params }) => {
     try {
       const resultAction = await dispatch(addWeek(billNo));
       if (!addWeek.fulfilled.match(resultAction)) {
-        throw new Error("Failed to add new week.");
+        const errorMessage =
+          resultAction.payload?.message ||
+          resultAction.error?.message ||
+          "Failed to add new week.";
+        throw new Error(errorMessage);
       }
       await refreshBillData();
+      Swal.fire("Success", "New week added successfully!", "success");
     } catch (error) {
-      console.error("Failed to add new week:", error.message);
-      alert("Something went wrong while adding new week.");
+      Swal.fire(
+        "Error",
+        error.message || "Something went wrong while adding new week.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,17 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 const Customers = ({ bills }) => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [hoveredBox, setHoveredBox] = useState(null);
   const [selectedArea, setSelectedArea] = useState(""); // State for area filter
+
+  const router = useRouter();
+
+  const handleCustomerClick = (billNo) => {
+    router.push(`/bills/${billNo}`);
+  };
 
   // Group bills by unique customer phone and get unique areas
   const { customers, uniqueAreas } = useMemo(() => {
@@ -106,9 +113,10 @@ const Customers = ({ bills }) => {
           customers.map((customer, index) => (
             <div
               key={index}
+              onClick={() => handleCustomerClick(customer.bills[0]?.billNo)}
               onMouseMove={(e) => handleMouseMove(e, index)}
               onMouseLeave={() => setHoveredBox(null)}
-              className="relative border p-5 w-[90%] md:w-[48%] lg:w-[30%] xl:w-[25%] rounded-lg shadow bg-white dark:bg-black overflow-hidden"
+              className="relative border p-5 w-[90%] md:w-[48%] lg:w-[30%] xl:w-[25%] rounded-lg shadow bg-white dark:bg-black overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
             >
               {hoveredBox === index && (
                 <div
@@ -120,8 +128,9 @@ const Customers = ({ bills }) => {
                 />
               )}
               <div className="relative z-10">
-                <p className="text-lg font-semibold">
-                  <strong>Name:</strong> {customer.customerName}
+                <p className="text-xl md:text-2xl font-semibold">
+                  <strong className="text-lg">Name:</strong>{" "}
+                  {customer.customerName}
                 </p>
                 <p className="text-md text-gray-700 dark:text-gray-300">
                   <strong>Phone:</strong> {customer.customerPhone}
