@@ -188,6 +188,18 @@ const PDFReceiptGenerator = ({
       yPosition += 8;
       pdf.text("Remaining Amount:", 20, yPosition);
       pdf.setTextColor(220, 38, 38); // Red color for remaining amount
+      pdf.text(
+        `£${week.previousWeekRemainingAmount}`,
+        pageWidth - 20,
+        yPosition,
+        {
+          align: "right",
+        }
+      );
+
+      yPosition += 8;
+      pdf.text("Remaining Amount:", 20, yPosition);
+      pdf.setTextColor(220, 38, 38); // Red color for remaining amount
       pdf.text(`£${week.remainingAmount}`, pageWidth - 20, yPosition, {
         align: "right",
       });
@@ -337,6 +349,12 @@ const PDFReceiptGenerator = ({
               <span style="font-weight: 600; color: #1f2937;">Amount Received:</span>
               <span style="font-weight: 600; color: #059669;">£${
                 week.receivedAmount
+              }</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="font-weight: 600; color: #1f2937;">Remaining Amount of Previous Week:</span>
+              <span style="font-weight: 600; color: #dc2626;">£${
+                week.previousWeekRemainingAmount
               }</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
