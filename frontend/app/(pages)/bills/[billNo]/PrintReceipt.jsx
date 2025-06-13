@@ -214,11 +214,18 @@ const PDFReceiptGenerator = ({
         { align: "center" }
       );
 
-      // Download the PDF
-      const fileName = `Invoice_Receipt_${customerName}_Week${week.weekNo}_${
-        new Date().toISOString().split("T")[0]
-      }.pdf`;
-      pdf.save(fileName);
+      const blob = pdf.output("blob");
+      const url = URL.createObjectURL(blob);
+      const printWindow = window.open(url, "_blank");
+
+      if (printWindow) {
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+        };
+      } else {
+        alert("Popup blocked! Please allow popups for this site.");
+      }
 
       if (onSuccess) {
         onSuccess();
@@ -405,11 +412,18 @@ const PDFReceiptGenerator = ({
         heightLeft -= pageHeight;
       }
 
-      // Download the PDF
-      const fileName = `Invoice_Receipt_${customerName}_Week${week.weekNo}_${
-        new Date().toISOString().split("T")[0]
-      }.pdf`;
-      pdf.save(fileName);
+      const blob = pdf.output("blob");
+      const url = URL.createObjectURL(blob);
+      const printWindow = window.open(url, "_blank");
+
+      if (printWindow) {
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+        };
+      } else {
+        alert("Popup blocked! Please allow popups for this site.");
+      }
 
       // Call success callback if provided
       if (onSuccess) {

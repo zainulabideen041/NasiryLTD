@@ -79,6 +79,9 @@ const AddInvoice = async (req, res) => {
 
     // Ensure totalAmount is initialized
     targetWeek.totalAmount = (targetWeek.totalAmount || 0) + Invoice_amount;
+    if (targetWeek.remainingAmount > 0) {
+      targetWeek.remainingAmount = targetWeek.remainingAmount + Invoice_amount;
+    }
 
     await bill.save();
 

@@ -47,6 +47,10 @@ const billSchema = new mongoose.Schema({
       remainingAmount: {
         type: Number,
       },
+      previousWeekRemainingAmount: {
+        type: Number,
+        default: 0,
+      },
       receivedAmount: {
         type: Number,
         default: 0,

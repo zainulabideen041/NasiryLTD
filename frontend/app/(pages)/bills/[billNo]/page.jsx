@@ -85,7 +85,7 @@ const BillDetails = ({ params }) => {
   const canAddNewWeek = () => {
     if (weeks.length === 0) return false;
     const lastWeek = weeks[weeks.length - 1];
-    return hasWeekFiveInvoices(lastWeek);
+    return hasWeekFiveDifferentDates(lastWeek);
   };
 
   // NEW: Check if bill has any invoices in any week
@@ -281,27 +281,23 @@ const BillDetails = ({ params }) => {
   return (
     <div className="relative w-full p-2 md:p-4">
       <div className="mb-6 flex flex-wrap gap-3">
-        {bill.status === "active" && (
-          <>
-            {canAddNewWeek() && (
-              <Button
-                onClick={NewWeek}
-                className="hover:cursor-pointer bg-[var(--ring)] text-white text-xl"
-              >
-                Add New Week
-              </Button>
-            )}
-            {/* UPDATED: Only show delete button if bill has NO invoices */}
-            {!billHasAnyInvoices() && (
-              <Button
-                onClick={billDelete}
-                variant="destructive"
-                className="hover:cursor-pointer text-xl"
-              >
-                Delete Bill
-              </Button>
-            )}
-          </>
+        {canAddNewWeek() && (
+          <Button
+            onClick={NewWeek}
+            className="hover:cursor-pointer bg-[var(--ring)] text-white text-xl"
+          >
+            Add New Week
+          </Button>
+        )}
+        {/* UPDATED: Only show delete button if bill has NO invoices */}
+        {!billHasAnyInvoices() && (
+          <Button
+            onClick={billDelete}
+            variant="destructive"
+            className="hover:cursor-pointer text-xl"
+          >
+            Delete Bill
+          </Button>
         )}
       </div>
 
@@ -315,8 +311,32 @@ const BillDetails = ({ params }) => {
         >
           <div className="mb-4">
             <h1 className="text-2xl lg:text-4xl lg:font-extrabold font-bold tracking-wide mb-2">
-              {bill.customerName} - Week {currentWeek?.weekNo || index + 1}
+              {bill.customerName} -{" "}
+              {(() => {
+                const invoices = currentWeek?.invoices || [];
+                if (invoices.length === 0)
+                  return `Week ${currentWeek?.weekNo || index + 1}`;
+
+                const dates = invoices
+                  .map((inv) => new Date(inv.invoiceDate))
+                  .sort((a, b) => a - b);
+
+                const format = (date) => date.toLocaleDateString("en-CA"); // yyyy-mm-dd
+
+                const uniqueDateStrings = [
+                  ...new Set(dates.map((d) => d.toDateString())),
+                ];
+
+                if (uniqueDateStrings.length >= 5) {
+                  return `${format(dates[0])} to ${format(
+                    dates[dates.length - 1]
+                  )}`;
+                }
+
+                return format(dates[0]);
+              })()}
             </h1>
+
             <div className="text-sm text-gray-600 mb-4">
               Invoices: {getWeekInvoiceCount(currentWeek)}/5 (Unique dates:{" "}
               {getWeekUniqueDatesCount(currentWeek)}/5)
@@ -329,7 +349,7 @@ const BillDetails = ({ params }) => {
           </div>
 
           {/* UPDATED: Add Invoice Component - Only show if week doesn't have 5 different dates and bill is active */}
-          {bill.status === "active" && canWeekAddInvoices(currentWeek) && (
+          {canWeekAddInvoices(currentWeek) && (
             <AddInvoice
               weekNo={currentWeek.weekNo}
               formData={formData}

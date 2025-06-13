@@ -89,6 +89,14 @@ const EditInvoice = ({
               </TableCell>
             </TableRow>
             <TableRow className="flex justify-between">
+              <TableCell colSpan={2}>
+                Remaining Amount of Previous Week
+              </TableCell>
+              <TableCell className="text-right font-semibold text-red-700">
+                £ {week.previousWeekRemainingAmount || 0}
+              </TableCell>
+            </TableRow>
+            <TableRow className="flex justify-between">
               <TableCell colSpan={2}>Remaining Amount</TableCell>
               <TableCell className="text-right font-semibold text-red-700">
                 £ {week.remainingAmount}

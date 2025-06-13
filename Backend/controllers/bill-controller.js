@@ -143,21 +143,16 @@ const AddWeek = async (req, res) => {
     const lastWeek = bill.week[bill.week.length - 1];
     const nextWeekNo = lastWeek ? lastWeek.weekNo + 1 : 1;
 
-    // Calculate and collect remaining amounts from previous weeks
-    let totalRemaining = 0;
-    bill.week.forEach((week) => {
-      if (week.remainingAmount > 0) {
-        totalRemaining += week.remainingAmount;
-        week.remainingAmount = 0; // Reset previous week's remaining amount
-      }
-    });
+    // Use only the last week's remainingAmount
+    const carryForwardAmount = lastWeek?.remainingAmount || 0;
 
-    // Add new week with accumulated remaining amount
+    // Add new week with the last week's remainingAmount
     bill.week.push({
       weekNo: nextWeekNo,
-      totalAmount: totalRemaining,
+      totalAmount: carryForwardAmount,
       receivedAmount: 0,
-      remainingAmount: totalRemaining,
+      previousWeekRemainingAmount: carryForwardAmount,
+      remainingAmount: carryForwardAmount,
       invoices: [],
     });
 
@@ -274,13 +269,38 @@ const UpdateBill = async (req, res) => {
     if (customerArea) bill.customerArea = customerArea;
     if (status) bill.status = status;
 
-    if (receivedAmount && weekNo) {
-      const targetWeek = bill.week.find((w) => w.weekNo === Number(weekNo));
-      if (targetWeek) {
-        targetWeek.receivedAmount = targetWeek.receivedAmount + receivedAmount;
-        targetWeek.remainingAmount =
-          (targetWeek.totalAmount || 0) - receivedAmount;
+    if (receivedAmount !== undefined && weekNo !== undefined) {
+      const numericReceivedAmount = Number(receivedAmount);
+      const numericWeekNo = Number(weekNo);
+
+      if (isNaN(numericReceivedAmount) || isNaN(numericWeekNo)) {
+        return res.status(400).json({
+          success: false,
+          message: "Received amount and week number must be valid numbers.",
+        });
       }
+
+      const targetWeek = bill.week.find((w) => w.weekNo === numericWeekNo);
+
+      if (!targetWeek) {
+        return res.status(400).json({
+          success: false,
+          message: "Specified week not found in the bill.",
+        });
+      }
+
+      const totalAmount = Number(targetWeek.totalAmount || 0);
+      const alreadyReceived = Number(targetWeek.receivedAmount || 0);
+
+      if (numericReceivedAmount + alreadyReceived > totalAmount) {
+        return res.status(400).json({
+          success: false,
+          message: `Received amount exceeds total amount for week ${numericWeekNo}. Total: ${totalAmount}, Already Received: ${alreadyReceived}`,
+        });
+      }
+
+      targetWeek.receivedAmount = alreadyReceived + numericReceivedAmount;
+      targetWeek.remainingAmount = totalAmount - targetWeek.receivedAmount;
     }
 
     await bill.save();
