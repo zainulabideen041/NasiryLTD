@@ -94,6 +94,7 @@ const BillDetails = ({ params }) => {
   };
 
   const [editInvoice, setEditInvoice] = useState(null);
+  const [editInvoicePopover, setEditInvoicePopover] = useState(false);
   const [showAddPopover, setShowAddPopover] = useState(false);
   const [showEditPopover, setShowEditPopover] = useState(false);
   const [formData, setFormData] = useState({
@@ -133,6 +134,17 @@ const BillDetails = ({ params }) => {
   };
 
   const handleRowClick = (invoice, weekNo) => {
+    const lastWeekNo = weeks.length > 0 ? weeks[weeks.length - 1].weekNo : null;
+
+    if (weekNo !== lastWeekNo) {
+      Swal.fire(
+        "Not allowed",
+        "You can only edit invoices of the current week.",
+        "info"
+      );
+      return;
+    }
+
     setEditInvoice(invoice.invoiceNo);
     setFormData({
       billNo: billNo,
@@ -141,6 +153,7 @@ const BillDetails = ({ params }) => {
       amount: invoice.amount,
       weekNo: weekNo,
     });
+    setEditInvoicePopover(true);
   };
 
   const handleChange = (field, value) => {
@@ -209,6 +222,7 @@ const BillDetails = ({ params }) => {
       }
       await refreshBillData();
       setEditInvoice(null);
+      setEditInvoicePopover(false);
       Swal.fire("Success", "Invoice updated successfully!", "success");
     } catch (error) {
       Swal.fire(
@@ -234,6 +248,7 @@ const BillDetails = ({ params }) => {
       }
       await refreshBillData();
       setEditInvoice(null);
+      setEditInvoicePopover(false);
       Swal.fire("Success", "Invoice deleted successfully!", "success");
     } catch (error) {
       Swal.fire(
@@ -414,6 +429,8 @@ const BillDetails = ({ params }) => {
             fiveInvoices={hasWeekFiveInvoices(currentWeek)}
             invoiceLength={hasWeekAnyInvoices(currentWeek)}
             handleRowClick={handleRowClick}
+            editInvoicePopover={editInvoicePopover}
+            setEditInvoicePopover={setEditInvoicePopover}
             bill={bill}
             week={currentWeek}
           />

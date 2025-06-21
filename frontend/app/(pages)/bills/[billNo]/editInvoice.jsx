@@ -23,8 +23,9 @@ import PrintReceipt from "./PrintReceipt";
 
 const EditInvoice = ({
   editInvoice,
-  setEditInvoice,
+  setEditInvoicePopover,
   week,
+  editInvoicePopover,
   invoiceLength,
   formData,
   handleChange,
@@ -111,13 +112,16 @@ const EditInvoice = ({
           </TableFooter>
         </Table>
       </div>
-
+      {console.log(editInvoice)}
       {editInvoice && (
-        <Popover open onOpenChange={(open) => !open && setEditInvoice(null)}>
+        <Popover open={editInvoicePopover} onOpenChange={setEditInvoicePopover}>
           <PopoverTrigger asChild>
             <button className="hidden" aria-hidden="true" />
           </PopoverTrigger>
-          <PopoverContent className="absolute top-45 left-2 lg:left-70 justify-center items-center text-center w-[44vh] md:w-[74vh] xl:w-[100vh]">
+          <PopoverContent
+            onInteractOutside={(e) => e.preventDefault()}
+            className="absolute top-45 left-2 lg:left-70 justify-center items-center text-center w-[44vh] md:w-[74vh] xl:w-[100vh]"
+          >
             <div className="grid gap-4">
               <h4 className="font-bold text-lg">
                 Edit Invoice {formData.invoiceNo}
@@ -203,6 +207,13 @@ const EditInvoice = ({
                   className="col-span-3 mt-2 hover:cursor-pointer"
                 >
                   Delete Invoice
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setEditInvoicePopover(false)}
+                  className="col-span-3 mt-2 hover:cursor-pointer"
+                >
+                  Close
                 </Button>
               </div>
             </div>
