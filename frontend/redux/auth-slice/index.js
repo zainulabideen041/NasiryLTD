@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const baseURL = "https://nasiry-backend.vercel.app/auth";
+const baseURL = `${process.env.NEXT_PUBLIC_APP_URL}/auth`;
 
 const initialState = {
   isAuthenticated: false,
