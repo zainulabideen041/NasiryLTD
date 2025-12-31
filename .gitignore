@@ -1,40 +1,250 @@
-Backend/node_modules
-frontend/node_modules
+# ========================================
+# Dependencies & Node Modules
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# ========================================
+# Environment Variables
+# ========================================
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env*.local
 
-# testing
-/coverage
+# ========================================
+# Next.js Build Output
+# ========================================
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
 
-# next.js
-/.next/
-/out/
+# ========================================
+# Production & Deployment
+# ========================================
+.vercel
+.netlify
+.firebase/
+.cache/
 
-# production
-/build
+# ========================================
+# Testing & Coverage
+# ========================================
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+playwright-report/
+junit.xml
 
-# misc
+# ========================================
+# Logs
+# ========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========================================
+# Operating System Files
+# ========================================
+# macOS
 .DS_Store
-*.pem
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
 
-# debug
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================================
+# IDE & Editor Files
+# ========================================
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+tags
+[._]*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ========================================
+# Database Files
+# ========================================
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# ========================================
+# Temporary & Cache Files
+# ========================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.cache
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.turbo/
+
+# ========================================
+# Media & Upload Files (Optional)
+# ========================================
+# Uncomment if you don't want to track uploaded files
+# uploads/
+# public/uploads/
+
+# ========================================
+# TypeScript
+# ========================================
+*.tsbuildinfo
+
+# ========================================
+# Miscellaneous
+# ========================================
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.webpack/
+.docusaurus
+.cache-loader
+
+# ========================================
+# Optional npm cache directory
+# ========================================
+.npm
+
+# ========================================
+# Optional eslint cache
+# ========================================
+.eslintcache
+
+# ========================================
+# Optional stylelint cache
+# ========================================
+.stylelintcache
+
+# ========================================
+# Microbundle cache
+# ========================================
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ========================================
+# Optional REPL history
+# ========================================
+.node_repl_history
+
+# ========================================
+# Output of 'npm pack'
+# ========================================
+*.tgz
+
+# ========================================
+# Yarn Integrity file
+# ========================================
+.yarn-integrity
+
+# ========================================
+# Storybook
+# ========================================
+storybook-static/
+
+# ========================================
+# Debug
+# ========================================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
